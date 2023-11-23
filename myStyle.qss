@@ -1,0 +1,29 @@
+QFrame#mainUI{
+    border-image:url(:/source/png/1.jpg);
+}
+
+/*左侧栏UI样式*/
+#listWidget{
+    background:transparent;
+     border-style:flat;
+}
+
+QFrame#back{
+    background:#dc9f50;
+    border-style:flat;
+}
+
+QListWidget#listWidget::item{
+    color:white;
+    border:0px;
+    border-style:flat;
+}
+
+QListWidget#listWidget::item:selected{
+    color:white;
+    background-color:#d06d45;
+    border:0px;
+    border-style:flat;
+}
+
+
