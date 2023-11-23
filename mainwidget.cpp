@@ -26,13 +26,13 @@ MainWidget::MainWidget(QWidget *parent)
     file.open(QFile::ReadOnly);
     this->setStyleSheet(file.readAll());
 
-    QString styleStr = dir+"/../../LittleCat/source/png/1.jpg";
+    QString styleStr = dir+"/../source/png/1.jpg";
     qDebug()<<styleStr;
 
-    ui->frame_2->setStyleSheet(QString("border-image:url(%1);").arg(styleStr));
+//    ui->frame_2->setStyleSheet(QString("border-image:url(%1);").arg(styleStr));
 
-//    ui->frame_2->setStyleSheet(file.readAll());
-//    ui->frame_2->setObjectName("mainUI");
+    ui->frame_2->setStyleSheet(file.readAll());
+    ui->frame_2->setObjectName("mainUI");
     file.close();
 
     ui->frame_2->installEventFilter(this);
