@@ -5,6 +5,7 @@
 #include <QWidget>
 #include "Component/leftsidebarbutton.h"
 #include <QVBoxLayout>
+#include <Component/mainfrom.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
@@ -23,6 +24,8 @@ private:
     Ui::MainWidget *ui;
 
     LeftSideBarButton *leftUI;
+
+    MainFrom *mainFrom;
 
     QVBoxLayout LeftLayout;
 

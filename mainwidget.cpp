@@ -9,7 +9,8 @@
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget)
-    ,leftUI(nullptr)
+    , leftUI(nullptr)
+    , mainFrom(nullptr)
 {
     ui->setupUi(this);
 
@@ -36,6 +37,10 @@ MainWidget::MainWidget(QWidget *parent)
     file.close();
 
     ui->frame_2->installEventFilter(this);
+
+
+    mainFrom = new MainFrom(ui->frame_2);
+//    mainFrom->show();
 
 }
 

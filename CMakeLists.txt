@@ -13,7 +13,9 @@ find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
+        Network
         REQUIRED)
+
 
 include_directories( .
     ./Component
@@ -28,6 +30,7 @@ target_link_libraries(Vanilla
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        Qt::Network
 )
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
