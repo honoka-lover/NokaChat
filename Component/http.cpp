@@ -141,7 +141,7 @@ void Http::onReadyRead()
 
     m_downLoadedBytes =m_file.size();
 
-    emit fileDownloadProgress(m_downLoadedBytes, m_fileSize);
+    emit this->fileDownloadProgress(m_downLoadedBytes, m_fileSize);
     if(m_file.size() == m_fileSize)
     {
         qDebug()<<"download finished!";

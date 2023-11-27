@@ -1,7 +1,9 @@
 #include <QUrl>
 #include <QFile>
+#include <QPen>
 #include "downloadsoft.h"
 #include "ui_downloadsoft.h"
+
 
 downloadSoft::downloadSoft(QWidget *parent) :
     QWidget(parent),
@@ -18,3 +20,4 @@ void downloadSoft::StartDownload(QString m_downloadUrl)
 {
 
 }
+

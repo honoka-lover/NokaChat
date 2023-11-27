@@ -16,10 +16,10 @@ MainWidget::MainWidget(QWidget *parent)
 
     leftUI = new LeftSideBarButton();
     LeftLayout.addWidget(leftUI);
+    leftUI->show();
     LeftLayout.setSpacing(0);
     LeftLayout.setContentsMargins(0,0,0,0);
     ui->frame->setLayout(&LeftLayout);
-
 
     auto dir = QApplication::applicationDirPath();
 //    QFile file(QString(dir+"/../myStyle.qss"));
@@ -39,8 +39,11 @@ MainWidget::MainWidget(QWidget *parent)
     ui->frame_2->installEventFilter(this);
 
 
-    mainFrom = new MainFrom(ui->frame_2);
-//    mainFrom->show();
+    if(mainFrom == nullptr){
+        mainFrom = new MainFrom(ui->frame_2);
+        mainFrom->show();
+    }
+
 
 }
 

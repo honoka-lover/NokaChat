@@ -23,6 +23,10 @@ private:
 
     void resizeEvent(QResizeEvent *event);
 
+    void paintEvent(QPaintEvent *event);
+
+    bool eventFilter(QObject *watched,QEvent *event);
+
 
 };
 

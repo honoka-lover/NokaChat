@@ -13,6 +13,16 @@
   <property name="windowTitle">
    <string>MainWidget</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#MainWidget{
+background:url(:/source/png/1.jpg);
+border-style:flat;
+ background-position:  center;
+background-repeat: no-repeat;
+}
+
+</string>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
    <property name="spacing">
     <number>0</number>

@@ -1,5 +1,5 @@
 QFrame#mainUI{
-    border-image:url(:/source/png/1.jpg);
+    border-image:url(:/source/png/transparent.png);
 }
 
 /*左侧栏UI样式*/

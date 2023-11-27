@@ -31,7 +31,7 @@ private:
     void getCurrentFileSize();
 
 signals:
-    void fileDownloadProgress(qint64 cur, qint64 total);
+    void fileDownloadProgress(long long  cur, long long total);
 
 private slots:
     void onfinishedRequest();
