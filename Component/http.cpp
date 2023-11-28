@@ -42,7 +42,7 @@ void Http::stopDownLoad()
 
 void Http::getCurrentFileSize()
 {
-    QFileInfo fileInfo("C:\\Users\\ASUS\\Desktop\\"+m_fileName);
+    QFileInfo fileInfo("./"+m_fileName);
     if(fileInfo.exists())
     {
         m_currentLoadedBytes = fileInfo.size();
@@ -133,7 +133,7 @@ void Http::onReadyRead()
 
     if(!m_file.isOpen())
     {
-        m_file.setFileName("C:\\Users\\ASUS\\Desktop\\"+m_fileName);
+        m_file.setFileName("./"+m_fileName);
         m_file.open(QIODevice::WriteOnly|QIODevice::Append);
     }
 

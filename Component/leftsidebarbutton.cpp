@@ -97,6 +97,8 @@ bool LeftSideBarButton::eventFilter(QObject *watched, QEvent *event)
         p.setColor(Qt::transparent);
         painter.setPen(p);
 
+//        painter.setCompositionMode( QPainter::CompositionMode_Clear );
+
         painter.drawRect(0, 0, width(), height());
 
         return true;

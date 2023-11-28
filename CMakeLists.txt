@@ -9,6 +9,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_PREFIX_PATH "E:/qt6/Tools/CMake_64/bin")
 set(CMAKE_PREFIX_PATH "E:/qt6/6.5.2/mingw_64/lib/cmake")
 
+set(INC_DIR E:/qt6/Tools/OpenSSLv3/Win_x64/include)
+set(LINK_DIR E:/qt6/Tools/OpenSSLv3/Win_x64/lib)
+include_directories(${INC_DIR})
+link_directories(${LINK_DIR})
+link_libraries(libcrypto libssl)
+
 find_package(Qt6 COMPONENTS
         Core
         Gui
@@ -16,6 +22,9 @@ find_package(Qt6 COMPONENTS
         Network
         REQUIRED)
 
+find_package(OpenSSL REQUIRED)
+
+link_libraries("E:/qt6/Tools/OpenSSLv3/Win_x64/lib/libssl.lib")
 
 include_directories( .
     ./Component
@@ -31,7 +40,10 @@ target_link_libraries(Vanilla
         Qt::Gui
         Qt::Widgets
         Qt::Network
+        OpenSSL::SSL
+        OpenSSL::Crypto
 )
+
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)
