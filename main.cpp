@@ -5,6 +5,7 @@
 
 #include <QLocale>
 #include <QTranslator>
+#include <QSslSocket>
 
 int main(int argc, char *argv[])
 {

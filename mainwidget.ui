@@ -14,12 +14,7 @@
    <string>MainWidget</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#MainWidget{
-background:url(:/source/png/1.jpg);
-border-style:flat;
- background-position:  center;
-background-repeat: no-repeat;
-}
+   <string notr="true">
 
 </string>
   </property>

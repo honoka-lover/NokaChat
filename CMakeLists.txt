@@ -36,13 +36,16 @@ add_executable(Vanilla
         ${AllFile}
         resource.qrc)
 target_link_libraries(Vanilla
+        PRIVATE
         Qt::Core
         Qt::Gui
         Qt::Widgets
-        Qt::Network
+        Qt6::Network
         OpenSSL::SSL
         OpenSSL::Crypto
 )
+
+
 
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

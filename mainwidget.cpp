@@ -14,6 +14,8 @@ MainWidget::MainWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
+//    ui->frame->setWindowOpacity(0);
+
     leftUI = new LeftSideBarButton();
     LeftLayout.addWidget(leftUI);
     leftUI->show();
@@ -27,13 +29,19 @@ MainWidget::MainWidget(QWidget *parent)
     file.open(QFile::ReadOnly);
     this->setStyleSheet(file.readAll());
 
-    QString styleStr = dir+"/../source/png/1.jpg";
+    QString styleStr = dir+"/../../NokaChat/source/png/1.jpg";
     qDebug()<<styleStr;
 
-//    ui->frame_2->setStyleSheet(QString("border-image:url(%1);").arg(styleStr));
+    {//设置右边背景图片
+        ui->frame_2->setStyleSheet(QString("QFrame#mainUI{border-image:url(%1);}").arg(styleStr));
+        ui->frame_2->setObjectName("mainUI");
+    }
+    {//设置背景图片
+        ui->frame->setStyleSheet(QString("QFrame#mainUI{background-color: rgba(234, 140, 103, 0);}"));
+        ui->frame->setObjectName("mainUI");
+    }
 
-    ui->frame_2->setStyleSheet(file.readAll());
-    ui->frame_2->setObjectName("mainUI");
+
     file.close();
 
     ui->frame_2->installEventFilter(this);
@@ -55,17 +63,17 @@ MainWidget::~MainWidget()
 bool MainWidget::eventFilter(QObject *watched, QEvent *event) {
     if(watched == ui->frame_2 && event->type() == QEvent::Paint)//发生绘图事件，且是在widget上发生的
     {
-        paintRect();
-        QPainter painter(ui->frame_2);
+//        paintRect();
+//        QPainter painter(ui->frame_2);
 
-        // 设置画笔样式
-        QPen pen(Qt::red);
-        pen.setWidth(3);
-        painter.setPen(pen);
+//        // 设置画笔样式
+//        QPen pen(Qt::red);
+//        pen.setWidth(3);
+//        painter.setPen(pen);
 
-        // 绘制圆形
-        QRectF rectangle(10.0, 20.0, 80.0, 80.0);    // 圆形所在矩形位置和大小
-        painter.drawEllipse(rectangle);
+//        // 绘制圆形
+//        QRectF rectangle(10.0, 20.0, 80.0, 80.0);    // 圆形所在矩形位置和大小
+//        painter.drawEllipse(rectangle);
 
         return true;
     }

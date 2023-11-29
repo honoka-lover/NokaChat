@@ -5,6 +5,7 @@
 #include "QLinearGradient"
 #include "QPen"
 #include "QPainter"
+#include "QDebug"
 
 LeftSideBarButton::LeftSideBarButton(QWidget *parent) :
     QWidget(parent),
@@ -14,16 +15,16 @@ LeftSideBarButton::LeftSideBarButton(QWidget *parent) :
 
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setAttribute(Qt::WA_TranslucentBackground,true);
-    this->setWindowOpacity(0.5);
+//    this->setWindowOpacity(0.5);
 
     //初始化样式表
-    QFile file(QString(":/myStyle.qss"));
+    auto dir = QApplication::applicationDirPath();
+    QFile file(QString(dir+"/../../NokaChat/myStyle.qss"));
     file.open(QFile::ReadOnly);
     this->setStyleSheet(file.readAll());
+    qDebug()<<dir+"/../../NokaChat/myStyle.qss";
+    qDebug()<<"hello"<<file.readAll();
     file.close();
-
-
-
 //    ui->frame->setObjectName("back");
 //    ui->frame_2->setObjectName("back");
 //    ui->frame_3->setObjectName("back");
@@ -67,27 +68,15 @@ void LeftSideBarButton::resizeEvent(QResizeEvent *event)
 }
 
 void LeftSideBarButton::paintEvent(QPaintEvent *event) {
-//    QLinearGradient gradient(0, 0, 0, height());
-//    gradient.setColorAt(0, QColor(0, 255, 0, 1));
-//    gradient.setColorAt(1, QColor(0, 0, 255, 1));
 
-//    QPainter painter(this);
-//    painter.setRenderHint(QPainter::Antialiasing);
-//    painter.setBrush(gradient);
-
-//    QPen p = painter.pen();
-//    p.setColor(Qt::transparent);
-//    painter.setPen(p);
-
-//    painter.drawRect(0, 0, width(), height());
 }
 
 bool LeftSideBarButton::eventFilter(QObject *watched, QEvent *event)
 {
     if(watched == ui->frame && event->type() == QEvent::Paint){
         QLinearGradient gradient(0, 0, 0, height());
-        gradient.setColorAt(0, QColor(0, 255, 0));
-        gradient.setColorAt(1, QColor(0, 0, 255));
+        gradient.setColorAt(0, QColor(0, 255, 0,100));
+        gradient.setColorAt(1, QColor(0, 0, 255,100));
 
         QPainter painter(ui->frame);
         painter.setRenderHint(QPainter::Antialiasing);

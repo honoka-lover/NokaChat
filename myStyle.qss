@@ -8,21 +8,21 @@ QFrame#mainUI{
      border-style:flat;
 }
 
-QFrame#back{
-    background:#dc9f50;
-    border-style:flat;
-}
 
 QListWidget#listWidget::item{
     color:white;
-    border:0px;
+    border:none;
     border-style:flat;
 }
 
 QListWidget#listWidget::item:selected{
     color:white;
-    background-color:#d06d45;
-    border:0px;
+    background-color: rgba(234, 140, 103, 0.5);
+    border:none;
+    border-style:flat;
+}
+
+QFrame{
     border-style:flat;
 }
 
