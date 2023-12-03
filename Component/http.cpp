@@ -19,7 +19,7 @@ Http::~Http()
     if(m_reply)
     {
         m_reply->deleteLater();
-        m_reply=NULL;
+        m_reply=nullptr;
     }
 }
 
@@ -28,7 +28,7 @@ void Http::stopDownLoad()
     if(m_reply == nullptr) return;
 
     disconnect(m_reply,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
-    disconnect(m_reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(onError(QNetworkReply::NetworkError)));
+    disconnect(m_reply,&QNetworkReply::errorOccurred,this,&Http::onError);
     disconnect(m_reply,SIGNAL(finished()),this,SLOT(onfinishedRequest()));
 
     m_reply->abort();
@@ -124,7 +124,7 @@ void Http::onfinishedRequest()
 
     connect(m_reply,SIGNAL(finished()),this,SLOT(onfinishedRequest()));
     connect(m_reply,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
-    connect(m_reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(onError(QNetworkReply::NetworkError)));
+    connect(m_reply,&QNetworkReply::errorOccurred,this,&Http::onError);
 }
 
 void Http::onReadyRead()
