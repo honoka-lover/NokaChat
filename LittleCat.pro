@@ -8,26 +8,14 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += \
-    Component/downloadsoft.cpp \
-    Component/http.cpp \
-    Component/leftsidebarbutton.cpp \
-    Component/mainfrom.cpp \
-    main.cpp \
-    mainwidget.cpp
+SOURCES += $$files($$PWD/*.cpp) \
+    $$files($$PWD/Component/*.cpp,true)
 
-HEADERS += \
-    Component/downloadsoft.h \
-    Component/http.h \
-    Component/leftsidebarbutton.h \
-    Component/mainfrom.h \
-    mainwidget.h
+HEADERS += $$files($$PWD/*.h) \
+    $$files($$PWD/Component/*.h,true)
 
-FORMS += \
-    Component/downloadsoft.ui \
-    Component/leftsidebarbutton.ui \
-    Component/mainfrom.ui \
-    mainwidget.ui
+FORMS += $$files($$PWD/*.ui) \
+    $$files($$PWD/Component/*.ui,true)
 
 TRANSLATIONS += \
     Vanilla_zh_CN.ts

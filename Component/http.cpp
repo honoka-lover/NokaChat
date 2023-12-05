@@ -55,6 +55,23 @@ void Http::getCurrentFileSize()
 
 void Http::startDownLoad(const QString &url)
 {
+    // {
+    //     QNetworkAccessManager manager;
+    //     QNetworkRequest request;
+    //     request.setUrl(url);
+    //     qDebug() << "Getting the file size...";
+    //     QEventLoop loop;
+    //     //发出请求，获取目标地址的头部信息
+    //     QNetworkReply *reply = manager.head(request);
+    //     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()), Qt::DirectConnection);
+    //     loop.exec();
+    //     QVariant var = reply->header(QNetworkRequest::ContentLengthHeader);
+    //     // qDebug() <<u8"文件大小：" <<reply->rawHeader("Content-Length").toInt();
+    //     delete reply;
+    //     qint64 size = var.toLongLong();
+    //     qDebug() << "The file size is: " << size;
+
+    // }
     m_url = url;
     if(m_url.isEmpty()) return;
 
