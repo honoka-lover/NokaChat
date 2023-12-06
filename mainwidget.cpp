@@ -23,6 +23,10 @@ MainWidget::MainWidget(QWidget *parent)
     LeftLayout.setContentsMargins(0,0,0,0);
     ui->frame->setLayout(&LeftLayout);
 
+    rightUI = new downloadSoft();
+    RightLayout.addWidget(rightUI);
+    ui->frame_2->setLayout(&RightLayout);
+
     auto dir = QApplication::applicationDirPath();
 //    QFile file(QString(dir+"/../myStyle.qss"));
     QFile file(QString(":/myStyle.qss"));
@@ -49,7 +53,7 @@ MainWidget::MainWidget(QWidget *parent)
 
     if(mainFrom == nullptr){
         mainFrom = new MainFrom(ui->frame_2);
-        mainFrom->show();
+        mainFrom->hide();
     }
 
 

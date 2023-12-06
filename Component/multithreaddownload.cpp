@@ -1,14 +1,16 @@
 #include "multithreaddownload.h"
 
-//多线程下载的线程数
-const int PointCount = 5;
-//目标文件的地址
-QString strUrl = "http://download.qt.io/archive/qt/5.14/5.14.2/submodules/qtdeclarative-everywhere-src-5.14.2.tar.xz";
+// //多线程下载的线程数
+// int PointCount = 5;
+// //目标文件的地址
+// QString strUrl = "http://download.qt.io/archive/qt/5.14/5.14.2/submodules/qtdeclarative-everywhere-src-5.14.2.tar.xz";
 
 
 MultithreadDownload::MultithreadDownload(QObject *parent)
     : QObject{parent}
-{}
+{
+
+}
 
 Download::Download(int index, QObject *parent)
     : QObject(parent), m_Index(index)
@@ -66,6 +68,7 @@ void Download::HttpReadyRead()
 
     //将读到的信息写入文件
     QByteArray buffer = m_Reply->readAll();
+    qDebug()<<"buffer size:"<<buffer.size();
     m_File->seek( m_StartPoint + m_HaveDoneBytes );
     m_File->write(buffer);
     m_HaveDoneBytes += buffer.size();
@@ -125,15 +128,16 @@ void DownloadControl::StartFileDownload(const QString &url, int count)
     Download *tempDownload;
 
     //将文件分成PointCount段，用异步的方式下载
-    qDebug() << "Start download file from " << strUrl;
+    qDebug() << "Start download file from " << url;
     for(int i=0; i<m_DownloadCount; i++)
     {
         //先算出每段的开头和结尾（HTTP协议所需要的信息）
         int start = m_FileSize * i / m_DownloadCount;
         int end = m_FileSize * (i+1) / m_DownloadCount;
-        if( i != 0 )
-            start--;
+        // if( i != 0 )
+        //     start++;
 
+        qDebug()<<"start:"<<start<<"end:"<<end;
         //分段下载该文件
         tempDownload = new Download(i+1, this);
         connect(tempDownload, SIGNAL(DownloadFinished()),
@@ -155,4 +159,25 @@ void DownloadControl::SubPartFinished()
         qDebug() << "Download finished";
     }
 }
+
+// #include "main.moc"
+
+// int main(int argc, char **argv)
+// {
+//     QCoreApplication app(argc, argv);
+//     qDebug() << QSslSocket::sslLibraryBuildVersionString();
+//     //用阻塞的方式下载文件，完成后退出
+//     DownloadControl *control = new DownloadControl;
+//     QEventLoop loop;
+//     QObject::connect(control, SIGNAL(FileDownloadFinished()),
+//                      &loop, SLOT(quit()));
+
+//     QTimer::singleShot(50,[=](){
+//         control->StartFileDownload(strUrl, PointCount);
+//     });
+
+//     loop.exec();
+
+//     return 0;
+// }
 

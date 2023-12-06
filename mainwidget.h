@@ -6,6 +6,7 @@
 #include "Component/leftsidebarbutton.h"
 #include <QVBoxLayout>
 #include <Component/mainfrom.h>
+#include <Component/downloadsoft.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
@@ -27,7 +28,9 @@ private:
 
     MainFrom *mainFrom;
 
-    QVBoxLayout LeftLayout;
+    downloadSoft *rightUI;
+
+    QVBoxLayout LeftLayout,RightLayout;
 
 protected:
 

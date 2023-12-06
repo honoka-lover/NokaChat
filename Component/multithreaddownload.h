@@ -55,27 +55,6 @@ private slots:
 };
 
 
-// #include "main.moc"
-
-// int main(int argc, char **argv)
-// {
-//     QCoreApplication app(argc, argv);
-//     qDebug() << QSslSocket::sslLibraryBuildVersionString();
-//     //用阻塞的方式下载文件，完成后退出
-//     DownloadControl *control = new DownloadControl;
-//     QEventLoop loop;
-//     QObject::connect(control, SIGNAL(FileDownloadFinished()),
-//                      &loop, SLOT(quit()));
-
-//     QTimer::singleShot(50,[=](){
-//         control->StartFileDownload(strUrl, PointCount);
-//     });
-
-//     loop.exec();
-
-//     return 0;
-// }
-
 class MultithreadDownload : public QObject
 {
     Q_OBJECT

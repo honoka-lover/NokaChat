@@ -2,6 +2,7 @@
 #define DOWNLOADSOFT_H
 
 #include <QWidget>
+#include "multithreaddownload.h"
 
 namespace Ui {
 class downloadSoft;
@@ -16,8 +17,13 @@ public:
     ~downloadSoft() override;
     void StartDownload(QString url);
 
+private slots:
+    void on_toolButton_clicked();
+
 private:
     Ui::downloadSoft *ui;
+
+    DownloadControl *downloadControl;
 };
 
 #endif // DOWNLOADSOFT_H
