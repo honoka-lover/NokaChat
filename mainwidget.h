@@ -5,8 +5,8 @@
 #include <QWidget>
 #include "Component/leftsidebarbutton.h"
 #include <QVBoxLayout>
-#include <Component/mainfrom.h>
-#include <Component/downloadsoft.h>
+#include "Component/mainfrom.h"
+#include "Component/downloadsoft.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }

@@ -2,6 +2,5 @@
     <qresource prefix="/">
         <file>myStyle.qss</file>
         <file>source/png/1.jpg</file>
-        <file>source/png/transparent.png</file>
     </qresource>
 </RCC>

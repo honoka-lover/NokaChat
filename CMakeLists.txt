@@ -7,9 +7,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_PREFIX_PATH "E:/qt6/Tools/CMake_64/bin")
-set(CMAKE_PREFIX_PATH "E:/qt6/6.5.2/mingw_64/lib/cmake")
+set(CMAKE_PREFIX_PATH "F:/QT/6.5.0/mingw_64/lib/cmake")
+set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
 
-#set(CMAKE_PREFIX_PATH "E:/qt5/5.12.8/mingw73_64/lib/cmake")
 
 find_package(Qt6 COMPONENTS
         Core
@@ -18,11 +18,9 @@ find_package(Qt6 COMPONENTS
         Network
         REQUIRED)
 
-find_package(OpenSSL REQUIRED)
 
 include_directories( .
     ./Component
-    E:/qt/Tools/OpenSSLv3/Win_x64/include/openssl
 )
 
 file(GLOB AllFile "./*.h" "./*.cpp" "./Component/*.h" "./Component/*.cpp" "./*.ui" "./Component/*.ui")
@@ -36,8 +34,6 @@ target_link_libraries(Vanilla
         Qt::Gui
         Qt::Widgets
         Qt::Network
-        OpenSSL::SSL 
-        OpenSSL::Crypto
 )
 
 

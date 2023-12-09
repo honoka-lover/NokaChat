@@ -33,7 +33,8 @@ MainWidget::MainWidget(QWidget *parent)
     file.open(QFile::ReadOnly);
     this->setStyleSheet(file.readAll());
 
-    QString styleStr = dir+"/../../NokaChat/source/png/1.jpg";
+    //QString styleStr = dir+"/../../NokaChat/source/png/1.jpg";
+    QString styleStr = dir + "/../../source/png/1.jpg";
     qDebug()<<styleStr;
 
     {//设置右边背景图片
