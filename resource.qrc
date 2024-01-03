@@ -1,6 +1,13 @@
 <RCC>
     <qresource prefix="/">
         <file>myStyle.qss</file>
+        <file>source/png/last.png</file>
+        <file>source/png/next.png</file>
+        <file>source/png/pause.png</file>
+        <file>source/png/start.png</file>
+        <file>source/png/transparent.png</file>
         <file>source/png/1.jpg</file>
+        <file>source/png/back.png</file>
+        <file>source/png/trumpt.png</file>
     </qresource>
 </RCC>

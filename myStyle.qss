@@ -1,5 +1,9 @@
 QFrame#mainUI{
-    border-image:url(:/source/png/transparent.png);
+    border-image:url(:/source/png/back.png);
+}
+
+QFrame#mainUI2{
+    background-color: rgba(234, 140, 103, 0);
 }
 
 /*左侧栏UI样式*/
@@ -8,6 +12,9 @@ QFrame#mainUI{
      border-style:flat;
 }
 
+QFrame {
+    border-style: flat;
+}
 
 QListWidget#listWidget::item{
     color:white;
@@ -22,8 +29,60 @@ QListWidget#listWidget::item:selected{
     border-style:flat;
 }
 
-QFrame{
-    border-style:flat;
+QToolButton#musicPlay{
+    border-image: url(:/source/png/pause.png);
 }
 
+QToolButton#musicPause{
+    border-image: url(:/source/png/start.png);
+}
+
+QToolButton#trumpt {
+    border-image: url(:/source/png/trumpt.png);
+}
+
+/*
+QToolButton:hover#musicPlay{
+    border-image: url(:/source/png/start.png);
+}*/
+
+QTreeView{
+    background:transparent;
+    color: rgb(255,255,255);
+    font: 24px;
+    outline:0px;
+}
+
+QTreeView::indicator{
+    height:80px;
+    width:80px;
+}
+
+QTreeView::indicator:checked{
+    border-image: none;
+    background-color: rgba(56, 62, 136, 0.466);
+}
+
+QTreeView::indicator:indeterminate{
+    border-image: none;
+}
+
+QTreeView::indicator:unchecked{
+    border-image: none;
+    background-color: white;
+}
+
+QTreeView::item{
+    height: 40px;
+}
+
+QTreeView::item:hover{
+    background-color: rgba(91, 97, 106, 0.123);
+    border-image: none;
+}
+
+QTreeView::item:selected{
+    border:none;
+    background-color: rgba(91, 97, 106, 0.8);
+}
 

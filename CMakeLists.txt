@@ -7,8 +7,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_PREFIX_PATH "E:/qt6/Tools/CMake_64/bin")
-set(CMAKE_PREFIX_PATH "F:/QT/6.5.0/mingw_64/lib/cmake")
-set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
+set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/mingw_64/lib/cmake")
+# set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
 
 
 find_package(Qt6 COMPONENTS
@@ -16,6 +16,7 @@ find_package(Qt6 COMPONENTS
         Gui
         Widgets
         Network
+        Multimedia
         REQUIRED)
 
 
@@ -23,7 +24,7 @@ include_directories( .
     ./Component
 )
 
-file(GLOB AllFile "./*.h" "./*.cpp" "./Component/*.h" "./Component/*.cpp" "./*.ui" "./Component/*.ui")
+file(GLOB AllFile "./*.h" "./*.cpp" "./Component/*.h" "./Component/*.cpp" "./*.ui" "./Component/*.ui" "./Component/musicPlayer/*.h" "./Component/musicPlayer/*.cpp" "./Component/musicPlayer/*.ui")
 
 add_executable(Vanilla
         ${AllFile}
@@ -34,6 +35,7 @@ target_link_libraries(Vanilla
         Qt::Gui
         Qt::Widgets
         Qt::Network
+        Qt::Multimedia
 )
 
 

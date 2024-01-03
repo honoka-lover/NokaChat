@@ -11,8 +11,13 @@ MainWidget::MainWidget(QWidget *parent)
     , ui(new Ui::MainWidget)
     , leftUI(nullptr)
     , mainFrom(nullptr)
+    , mymusicplayer(nullptr)
 {
     ui->setupUi(this);
+    auto dir = QApplication::applicationDirPath();
+    QFile file(QString(":/myStyle.qss"));
+    file.open(QFile::ReadOnly);
+    this->setStyleSheet(file.readAll());
 
 //    ui->frame->setWindowOpacity(0);
 
@@ -22,29 +27,28 @@ MainWidget::MainWidget(QWidget *parent)
     LeftLayout.setSpacing(0);
     LeftLayout.setContentsMargins(0,0,0,0);
     ui->frame->setLayout(&LeftLayout);
+    ui->frame->setMaximumWidth(400);
 
     rightUI = new downloadSoft();
     RightLayout.addWidget(rightUI);
     ui->frame_2->setLayout(&RightLayout);
 
-    auto dir = QApplication::applicationDirPath();
-//    QFile file(QString(dir+"/../myStyle.qss"));
-    QFile file(QString(":/myStyle.qss"));
-    file.open(QFile::ReadOnly);
-    this->setStyleSheet(file.readAll());
+    mymusicplayer = new MyMusicPlayer();
+    RightLayout.addWidget(mymusicplayer);
 
-    //QString styleStr = dir+"/../../NokaChat/source/png/1.jpg";
+
+    
+
+    
     QString styleStr = dir + "/../../source/png/1.jpg";
     qDebug()<<styleStr;
 
-    {//设置右边背景图片
-        ui->frame_2->setStyleSheet(QString("QFrame#mainUI{border-image:url(%1);}").arg(styleStr));
-        ui->frame_2->setObjectName("mainUI");
-    }
-    {//设置背景图片
-        ui->frame->setStyleSheet(QString("QFrame#mainUI{background-color: rgba(234, 140, 103, 0);}"));
-        ui->frame->setObjectName("mainUI");
-    }
+    //设置右边背景图片
+    ui->frame_2->setObjectName("mainUI");
+
+    //设置背景图片
+    ui->frame->setObjectName("mainUI2");
+    
 
 
     file.close();

@@ -61,9 +61,18 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>F:\QT\6.6.1\msvc2019_64\include\QtMultimedia;F:\QT\6.6.1\msvc2019_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(Qt_LIBS_);F:\QT\6.6.1\msvc2019_64\lib\Qt6Multimediad.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -93,6 +102,7 @@
     <ClCompile Include="Component\leftsidebarbutton.cpp" />
     <ClCompile Include="Component\mainfrom.cpp" />
     <ClCompile Include="Component\multithreaddownload.cpp" />
+    <ClCompile Include="Component\musicPlayer\mymusicplayer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwidget.cpp" />
   </ItemGroup>
@@ -100,6 +110,7 @@
     <QtUic Include="Component\downloadsoft.ui" />
     <QtUic Include="Component\leftsidebarbutton.ui" />
     <QtUic Include="Component\mainfrom.ui" />
+    <QtUic Include="Component\musicPlayer\myMusicPlayer.ui" />
     <QtUic Include="mainwidget.ui" />
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +121,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="source\png\1.jpg" />
+    <Image Include="source\png\last.png" />
+    <Image Include="source\png\next.png" />
+    <Image Include="source\png\pause.png" />
+    <Image Include="source\png\start.png" />
+    <Image Include="source\png\transparent.png" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="mainwidget.h" />
@@ -128,6 +144,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Component\leftsidebarbutton.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Component\musicPlayer\mymusicplayer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

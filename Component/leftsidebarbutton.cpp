@@ -17,14 +17,7 @@ LeftSideBarButton::LeftSideBarButton(QWidget *parent) :
     this->setAttribute(Qt::WA_TranslucentBackground,true);
 //    this->setWindowOpacity(0.5);
 
-    //初始化样式表
-    auto dir = QApplication::applicationDirPath();
-    QFile file(QString(dir+"/../../NokaChat/myStyle.qss"));
-    file.open(QFile::ReadOnly);
-    this->setStyleSheet(file.readAll());
-    qDebug()<<dir+"/../../NokaChat/myStyle.qss";
-    qDebug()<<"hello"<<file.readAll();
-    file.close();
+
 //    ui->frame->setObjectName("back");
 //    ui->frame_2->setObjectName("back");
 //    ui->frame_3->setObjectName("back");
