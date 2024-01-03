@@ -53,6 +53,12 @@
     <ClCompile Include="Component\multithreaddownload.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
+    <ClCompile Include="mymusicplayer.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\musicPlayer\mymusicplayer.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="mainwidget.ui">
@@ -65,6 +71,9 @@
       <Filter>Form Files\Component</Filter>
     </QtUic>
     <QtUic Include="Component\mainfrom.ui">
+      <Filter>Form Files\Component</Filter>
+    </QtUic>
+    <QtUic Include="Component\musicPlayer\myMusicPlayer.ui">
       <Filter>Form Files\Component</Filter>
     </QtUic>
   </ItemGroup>
@@ -95,6 +104,9 @@
       <Filter>Header Files\Component</Filter>
     </QtMoc>
     <QtMoc Include="Component\leftsidebarbutton.h">
+      <Filter>Header Files\Component</Filter>
+    </QtMoc>
+    <QtMoc Include="Component\musicPlayer\mymusicplayer.h">
       <Filter>Header Files\Component</Filter>
     </QtMoc>
   </ItemGroup>

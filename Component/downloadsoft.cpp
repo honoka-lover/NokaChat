@@ -1,6 +1,8 @@
 #include <QUrl>
 #include <QFile>
 #include <QPen>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include "downloadsoft.h"
 #include "ui_downloadsoft.h"
 

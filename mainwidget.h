@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include "Component/mainfrom.h"
 #include "Component/downloadsoft.h"
+#include "Component/musicPlayer/mymusicplayer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
@@ -31,6 +32,8 @@ private:
     downloadSoft *rightUI;
 
     QVBoxLayout LeftLayout,RightLayout;
+
+	MyMusicPlayer* mymusicplayer;
 
 protected:
 

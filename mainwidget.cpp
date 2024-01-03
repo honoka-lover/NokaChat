@@ -11,6 +11,7 @@ MainWidget::MainWidget(QWidget *parent)
     , ui(new Ui::MainWidget)
     , leftUI(nullptr)
     , mainFrom(nullptr)
+    , mymusicplayer(nullptr)
 {
     ui->setupUi(this);
 
@@ -26,6 +27,10 @@ MainWidget::MainWidget(QWidget *parent)
     rightUI = new downloadSoft();
     RightLayout.addWidget(rightUI);
     ui->frame_2->setLayout(&RightLayout);
+
+    mymusicplayer = new MyMusicPlayer();
+    RightLayout.addWidget(mymusicplayer);
+
 
     auto dir = QApplication::applicationDirPath();
 //    QFile file(QString(dir+"/../myStyle.qss"));
