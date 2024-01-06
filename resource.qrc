@@ -1,4 +1,4 @@
-<RCC>
+﻿<RCC>
     <qresource prefix="/">
         <file>myStyle.qss</file>
         <file>source/png/last.png</file>
