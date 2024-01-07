@@ -30,9 +30,12 @@ MyMusicPlayer::MyMusicPlayer(QWidget *parent)
 MyMusicPlayer::~MyMusicPlayer()
 {
 	delete ui;
-	delete m_player;
-	delete m_model;
-	delete m_timer;
+    if(m_player)
+	    delete m_player;
+    if(m_model)
+	    delete m_model;
+    if(m_timer)
+	    delete m_timer;
 }
 
 void MyMusicPlayer::initClass()
@@ -350,11 +353,7 @@ bool MyMusicPlayer::eventFilter(QObject *watched, QEvent *event)
 		horizontalSliderRelease();
 	}
 
-	// //释放鼠标时音乐条跟随时间去动
-	// if(watched != ui->horizontalSlider && event->type() == QMouseEvent::MouseButtonRelease){
-	// 	std::lock_guard<mutex> lock(sliderLock);
-	// 	audioSliderState = false;
-	// }
+
 
 	return false;
 }

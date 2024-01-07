@@ -19,8 +19,6 @@ MainWidget::MainWidget(QWidget *parent)
     file.open(QFile::ReadOnly);
     this->setStyleSheet(file.readAll());
 
-//    ui->frame->setWindowOpacity(0);
-
     leftUI = new LeftSideBarButton();
     LeftLayout.addWidget(leftUI);
     leftUI->show();

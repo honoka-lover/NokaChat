@@ -8,6 +8,9 @@
 #include <QUrl>
 #include <QString>
 #include <QTimer>
+#include <mutex>
+#include <thread>
+#include <iostream>
 
 class Download : public QObject
 {

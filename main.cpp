@@ -5,15 +5,14 @@
 
 
 #include <QSslSocket>
-
+#include <iostream>
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-     qDebug() << QSslSocket::sslLibraryBuildVersionString();
-
+    qDebug() << QSslSocket::sslLibraryBuildVersionString();
 
      MainWidget w;
      w.show();

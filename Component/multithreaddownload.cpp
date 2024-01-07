@@ -5,6 +5,7 @@
 // //目标文件的地址
 // QString strUrl = "http://download.qt.io/archive/qt/5.14/5.14.2/submodules/qtdeclarative-everywhere-src-5.14.2.tar.xz";
 
+static std::mutex m_mutex;
 
 MultithreadDownload::MultithreadDownload(QObject *parent)
     : QObject{parent}
@@ -58,6 +59,7 @@ void Download::FinishedSlot()
     m_Reply = 0;
     m_File = 0;
     qDebug() << "Part " << m_Index << " download finished";
+    qDebug() << "Part" << m_Index << "size: "<< m_HaveDoneBytes << "bit";
     emit DownloadFinished();
 }
 
@@ -66,10 +68,20 @@ void Download::HttpReadyRead()
     if ( !m_File )
         return;
 
+    std::lock_guard<std::mutex> lock(m_mutex);
     //将读到的信息写入文件
     QByteArray buffer = m_Reply->readAll();
-    qDebug()<<"buffer size:"<<buffer.size();
     m_File->seek( m_StartPoint + m_HaveDoneBytes );
+//    if(m_HaveDoneBytes + buffer.size() >= m_EndPoint - m_StartPoint){
+//        m_File->write(buffer, m_EndPoint - m_StartPoint- m_HaveDoneBytes);
+//        m_HaveDoneBytes += m_EndPoint - m_StartPoint - m_HaveDoneBytes ;
+//        disconnect(m_Reply, SIGNAL(finished()),this, SLOT(FinishedSlot()));
+//        disconnect(m_Reply, SIGNAL(readyRead()),this, SLOT(HttpReadyRead()));
+//        FinishedSlot();
+//        return;
+//    }
+//    qDebug()<<"buffer size:"<<buffer.size();
+//    qDebug()<<"当前进度："<< m_Index<<" : "<<m_HaveDoneBytes/1024 <<"kb";
     m_File->write(buffer);
     m_HaveDoneBytes += buffer.size();
 }
@@ -134,6 +146,7 @@ void DownloadControl::StartFileDownload(const QString &url, int count)
         //先算出每段的开头和结尾（HTTP协议所需要的信息）
         int start = m_FileSize * i / m_DownloadCount;
         int end = m_FileSize * (i+1) / m_DownloadCount;
+
         // if( i != 0 )
         //     start++;
 
@@ -154,6 +167,8 @@ void DownloadControl::SubPartFinished()
     //如果完成数等于文件段数，则说明文件下载完毕，关闭文件，发生信号
     if( m_FinishedNum == m_DownloadCount )
     {
+//        m_File->seek(m_FileSize);
+//        m_File->write("\0");
         m_File->close();
         emit FileDownloadFinished();
         qDebug() << "Download finished";
