@@ -73,6 +73,15 @@ private slots:
 
     //更新音乐进度条
     void slot_updateMusicSlider();
+
+    //左键按钮点击
+    void slot_leftButton();
+
+    //右键按钮点击
+    void slot_rightButton();
+
+    //换歌时切换音乐源
+    void slot_changeMusicSource();
 private:
     Ui::MyMusicPlayer* ui;
 
@@ -103,6 +112,7 @@ private:
     
     //记录音乐条是否处于按下状态
     std::atomic<bool> audioSliderState;
+
 };
 
 #endif // LEFTSIDEBARBUTTON_H

@@ -12,7 +12,13 @@
 using std::mutex;
 
 MyMusicPlayer::MyMusicPlayer(QWidget *parent)
-	: QWidget(parent), ui(new Ui::MyMusicPlayer), m_model(nullptr), m_currentMusic(""), m_durationTime(1), audioSlider(nullptr), audioSliderState(false)
+	: QWidget(parent),
+    ui(new Ui::MyMusicPlayer),
+    m_model(nullptr),
+    m_currentMusic(""),
+    m_durationTime(1),
+    audioSlider(nullptr),
+    audioSliderState(false)
 {
 	ui->setupUi(this);
 
@@ -107,6 +113,10 @@ void MyMusicPlayer::initConnect()
 
 	//更新音乐进度条
 	// connect(this,&MyMusicPlayer::updateMusicSlider,this,&MyMusicPlayer::slot_updateMusicSlider);
+
+    //绑定左右键点击按钮
+    connect(ui->leftButton,&QToolButton::clicked,this,&MyMusicPlayer::slot_leftButton);
+    connect(ui->rightButton,&QToolButton::clicked,this,&MyMusicPlayer::slot_rightButton);
 }
 
 void MyMusicPlayer::initStyle()
@@ -116,6 +126,10 @@ void MyMusicPlayer::initStyle()
 	ui->trumpetButton->setObjectName("trumpt");
 
 	ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    //默认选中首行
+    auto index = m_model->index(0,0);
+    ui->treeView->setCurrentIndex(index);
 
 	ui->horizontalSlider->setRange(0, 100);
 	ui->horizontalSlider->setValue(0);
@@ -356,4 +370,35 @@ bool MyMusicPlayer::eventFilter(QObject *watched, QEvent *event)
 
 
 	return false;
+}
+
+void MyMusicPlayer::slot_leftButton() {
+    if(m_model->invisibleRootItem()->rowCount()>0){
+        auto index = ui->treeView->currentIndex();
+        if(index.row() >0){
+            auto index1 = m_model->index(index.row()-1,0);
+            ui->treeView->setCurrentIndex(index1);
+            m_currentMusic = index1.data().toString();
+            slot_changeMusicSource();
+        }
+
+    }
+
+}
+
+void MyMusicPlayer::slot_rightButton() {
+    if(m_model->invisibleRootItem()->rowCount()>0){
+        auto index = ui->treeView->currentIndex();
+        if(index.row() < m_model->invisibleRootItem()->rowCount() -1){
+            auto index1 = m_model->index(index.row()+1,0);
+            ui->treeView->setCurrentIndex(index1);
+            m_currentMusic = index1.data().toString();
+            slot_changeMusicSource();
+        }
+
+    }
+}
+
+void MyMusicPlayer::slot_changeMusicSource() {
+    m_player->setSource(QUrl::fromLocalFile(m_currentMusic));
 }
