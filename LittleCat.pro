@@ -9,16 +9,17 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += $$files($$PWD/*.cpp) \
-    $$files($$PWD/Component/*.cpp,true)
+    $$files($$PWD/Component/*.cpp,true) \
+    $$files($$PWD/Component/musicPlayer/*.cpp,true)
 
 HEADERS += $$files($$PWD/*.h) \
     $$files($$PWD/Component/*.h,true)
+    $$files($$PWD/Component/musicPlayer/*.h,true)
+
 
 FORMS += $$files($$PWD/*.ui) \
     $$files($$PWD/Component/*.ui,true)
-
-TRANSLATIONS += \
-    Vanilla_zh_CN.ts
+    $$files($$PWD/Component/musicPlayer/*.ui,true)
 CONFIG += lrelease
 CONFIG += embed_translations
 
