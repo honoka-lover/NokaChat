@@ -8,7 +8,8 @@
 #include "Component/mainfrom.h"
 #include "Component/downloadsoft.h"
 #include "Component/musicPlayer/mymusicplayer.h"
-
+#include "Component/OpenGLWidget.h"
+#include "Component/videowidget.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
 QT_END_NAMESPACE
@@ -34,6 +35,8 @@ private:
     QVBoxLayout LeftLayout,RightLayout;
 
 	MyMusicPlayer* mymusicplayer;
+
+    VideoWidget *vedioPlayer;
 
 protected:
 

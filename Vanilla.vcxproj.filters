@@ -52,6 +52,15 @@
     <ClCompile Include="Component\musicPlayer\mymusicplayer.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
+    <ClCompile Include="Component\Camera.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\Model.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\OpenGLWidget.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="mainwidget.ui">
@@ -96,9 +105,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="mainwidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="Component\http.h">
       <Filter>Header Files\Component</Filter>
     </QtMoc>
@@ -117,10 +123,21 @@
     <QtMoc Include="Component\musicPlayer\mymusicplayer.h">
       <Filter>Header Files\Component</Filter>
     </QtMoc>
+    <QtMoc Include="Component\OpenGLWidget.h">
+      <Filter>Header Files\Component</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <None Include="myStyle.qss">
       <Filter>Resource Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Component\Camera.h">
+      <Filter>Header Files\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\Model.h">
+      <Filter>Header Files\Component</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

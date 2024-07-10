@@ -5,7 +5,7 @@
 #include "QApplication"
 #include <QPainter>
 #include "QTimer"
-
+#include "Component/videowidget.h"
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget)
@@ -29,15 +29,26 @@ MainWidget::MainWidget(QWidget *parent)
 
     rightUI = new downloadSoft();
     RightLayout.addWidget(rightUI);
-    ui->frame_2->setLayout(&RightLayout);
 
     mymusicplayer = new MyMusicPlayer();
     RightLayout.addWidget(mymusicplayer);
 
+    QSurfaceFormat format;
+    //设置每个每个像素采样样本个数，用于抗锯齿
+    format.setSamples(16);
+    vedioPlayer = new VideoWidget;
+    vedioPlayer->resize(800, 600);
+    vedioPlayer->setFormat(format);
+    vedioPlayer->show();
+    vedioPlayer->setFileName("../NokaChat/source/test.mp4");
 
-    
+    vedioPlayer->play();
 
-    
+
+
+    ui->frame_2->setLayout(&RightLayout);
+
+
     QString styleStr = dir + "/../../source/png/1.jpg";
     qDebug()<<styleStr;
 

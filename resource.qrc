@@ -9,5 +9,15 @@
         <file>source/png/1.jpg</file>
         <file>source/png/back.png</file>
         <file>source/png/trumpt.png</file>
+        <file>source/glsl/earth.fsh</file>
+        <file>source/glsl/earth.vsh</file>
+        <file>source/glsl/sky.fsh</file>
+        <file>source/glsl/sky.vsh</file>
+        <file>source/model/skybox/back.jpg</file>
+        <file>source/model/skybox/bottom.jpg</file>
+        <file>source/model/skybox/front.jpg</file>
+        <file>source/model/skybox/left.jpg</file>
+        <file>source/model/skybox/right.jpg</file>
+        <file>source/model/skybox/top.jpg</file>
     </qresource>
 </RCC>

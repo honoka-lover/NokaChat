@@ -19,7 +19,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3A8EB3B7-2823-4B25-8D89-D0510A08F06A}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
-    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
@@ -67,10 +67,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>F:\QT\6.6.1\msvc2019_64\include\QtMultimedia;F:\QT\6.6.1\msvc2019_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\myQtPro\NokaChat\include;F:\QT\6.6.1\msvc2019_64\include\QtMultimedia;F:\QT\6.6.1\msvc2019_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(Qt_LIBS_);F:\QT\6.6.1\msvc2019_64\lib\Qt6Multimediad.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(Qt_LIBS_);F:\QT\6.6.1\msvc2019_64\lib\Qt6Multimediad.lib;assimp-vc143-mt.lib;avutil.lib;swscale.lib;swresample.lib;postproc.lib;avcodec.lib;avformat.lib;avfilter.lib;avdevice.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\myQtPro\NokaChat\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -97,12 +98,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Component\Camera.cpp" />
     <ClCompile Include="Component\downloadsoft.cpp" />
     <ClCompile Include="Component\http.cpp" />
     <ClCompile Include="Component\leftsidebarbutton.cpp" />
     <ClCompile Include="Component\mainfrom.cpp" />
+    <ClCompile Include="Component\Model.cpp" />
     <ClCompile Include="Component\multithreaddownload.cpp" />
     <ClCompile Include="Component\musicPlayer\mymusicplayer.cpp" />
+    <ClCompile Include="Component\OpenGLWidget.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwidget.cpp" />
   </ItemGroup>
@@ -128,9 +132,6 @@
     <Image Include="source\png\transparent.png" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="mainwidget.h" />
-  </ItemGroup>
-  <ItemGroup>
     <QtMoc Include="Component\downloadsoft.h" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +148,11 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Component\musicPlayer\mymusicplayer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Component\Camera.h" />
+    <ClInclude Include="Component\Model.h" />
+    <QtMoc Include="Component\OpenGLWidget.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

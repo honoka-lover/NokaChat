@@ -1,0 +1,264 @@
+#include "videowidget.h"
+#include <QMatrix4x4>
+#include <QDebug>
+AVFormatContext* open_video_file(const char* filename) {
+    AVFormatContext* pFormatContext = avformat_alloc_context();
+    if (avformat_open_input(&pFormatContext, filename, nullptr, nullptr) != 0) {
+        return nullptr;
+    }
+    return pFormatContext;
+}
+
+VideoWidget::VideoWidget(QWidget* parent):
+    QOpenGLWidget(parent),
+    program(nullptr),
+    textureY(nullptr),
+    textureU(nullptr),
+    textureV(nullptr),
+    currentFrame(nullptr)
+{
+    m_fileName = "";
+    m_avFormatCxt = nullptr;
+    m_decodeThread = new DecodeThread(this);
+    connect(m_decodeThread,&DecodeThread::frameDecoded,this,&VideoWidget::setFrame);
+
+    videoWidth=0;
+    videoHeight = 0;
+}
+
+VideoWidget::~VideoWidget() {
+    if (program) delete program;
+    if (textureY) delete textureY;
+    if (textureU) delete textureU;
+    if (textureV) delete textureV;
+    if (currentFrame) av_frame_free(&currentFrame);
+    if (m_decodeThread){
+        m_decodeThread->terminate();
+        delete m_decodeThread;
+    }
+}
+
+void VideoWidget::setFileName(QString file)
+{
+    if(!m_fileName.isEmpty()){
+        avformat_close_input(&m_avFormatCxt);
+    }
+    m_fileName = file;
+    m_avFormatCxt = open_video_file(m_fileName.toStdString().c_str());
+    m_decodeThread->setFormatContext(m_avFormatCxt);
+    m_decodeThread->setVideoWidget(this);
+}
+
+void VideoWidget::play()
+{
+    m_decodeThread->start();
+}
+
+void VideoWidget::pause()
+{
+    m_decodeThread->terminate();
+}
+
+void VideoWidget::initializeGL() {
+    initializeOpenGLFunctions();
+
+    // 初始化着色器
+    initializeShader();
+
+    // 初始化纹理
+    initializeTextures();
+
+    // 初始化顶点缓冲区对象（VBO）和顶点数组对象（VAO）
+    GLfloat vertices[] = {
+        // 顶点坐标   // 纹理坐标
+        -1.0f, -1.0f, 0.0f, 1.0f,
+        1.0f, -1.0f, 1.0f, 1.0f,
+        1.0f,  1.0f, 1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f, 0.0f
+    };
+    GLuint indices[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+}
+
+void VideoWidget::initializeShader() {
+    program = new QOpenGLShaderProgram();
+    program->addShaderFromSourceCode(QOpenGLShader::Vertex,
+                                     R"(
+        #version 330 core
+        layout (location = 0) in vec2 vertex;
+        layout (location = 1) in vec2 texCoord;
+        out vec2 TexCoord;
+        void main() {
+            gl_Position = vec4(vertex, 0.0, 1.0);
+            TexCoord = texCoord;
+        }
+        )");
+    program->addShaderFromSourceCode(QOpenGLShader::Fragment,
+                                     R"(
+        #version 330 core
+        in vec2 TexCoord;
+        out vec4 FragColor;
+        uniform sampler2D textureY;
+        uniform sampler2D textureU;
+        uniform sampler2D textureV;
+        void main() {
+            float y = texture(textureY, TexCoord).r;
+            float u = texture(textureU, TexCoord).r - 0.5;
+            float v = texture(textureV, TexCoord).r - 0.5;
+            float r = y + 1.402 * v;
+            float g = y - 0.344 * u - 0.714 * v;
+            float b = y + 1.772 * u;
+            FragColor = vec4(r, g, b, 1.0);
+        }
+        )");
+    program->link();
+    program->bind();
+
+    textureUniformY = program->uniformLocation("textureY");
+    textureUniformU = program->uniformLocation("textureU");
+    textureUniformV = program->uniformLocation("textureV");
+}
+
+void VideoWidget::initializeTextures() {
+    textureY = new QOpenGLTexture(QOpenGLTexture::Target2D);
+    textureY->create();
+    textureY->setMinificationFilter(QOpenGLTexture::Linear);
+    textureY->setMagnificationFilter(QOpenGLTexture::Linear);
+    textureY->setWrapMode(QOpenGLTexture::ClampToEdge);
+
+    textureU = new QOpenGLTexture(QOpenGLTexture::Target2D);
+    textureU->create();
+    textureU->setMinificationFilter(QOpenGLTexture::Linear);
+    textureU->setMagnificationFilter(QOpenGLTexture::Linear);
+    textureU->setWrapMode(QOpenGLTexture::ClampToEdge);
+
+    textureV = new QOpenGLTexture(QOpenGLTexture::Target2D);
+    textureV->create();
+    textureV->setMinificationFilter(QOpenGLTexture::Linear);
+    textureV->setMagnificationFilter(QOpenGLTexture::Linear);
+    textureV->setWrapMode(QOpenGLTexture::ClampToEdge);
+}
+
+void VideoWidget::updateTextures() {
+    if (currentFrame) {
+        int width = currentFrame->width;
+        int height = currentFrame->height;
+
+        glActiveTexture(GL_TEXTURE0);
+        textureY->bind();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width,height,0,GL_RED, GL_UNSIGNED_BYTE,currentFrame->data[0]);
+        // textureY->setData(QOpenGLTexture::Red, QOpenGLTexture::UInt8, QSize(width, height), currentFrame->data[0]);
+        program->setUniformValue(textureUniformY, 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        textureU->bind();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width/2, height/2, 0,GL_RED, GL_UNSIGNED_BYTE,currentFrame->data[1]);
+        // textureU->setData(QOpenGLTexture::Red, QOpenGLTexture::UInt8, QSize(width / 2, height / 2), currentFrame->data[1]);
+        program->setUniformValue(textureUniformU, 1);
+
+        glActiveTexture(GL_TEXTURE2);
+        textureV->bind();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width/2,height/2,0,GL_RED, GL_UNSIGNED_BYTE,currentFrame->data[2]);
+        // textureV->setData(QOpenGLTexture::Red, QOpenGLTexture::UInt8, QSize(width / 2, height / 2), currentFrame->data[2]);
+        program->setUniformValue(textureUniformV, 2);
+    }
+}
+
+void VideoWidget::resizeGL(int w, int h) {
+    glViewport(0, 0, w, h);
+    if(videoHeight == 0&& videoHeight == 0)
+        return;
+    updateVertices(w, h, videoWidth, videoHeight);
+}
+
+void VideoWidget::paintGL() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    if (currentFrame) {
+        updateTextures();
+
+        program->bind();
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        program->release();
+    }
+}
+
+void VideoWidget::setFrame(QSharedPointer<AVFrame> frame) {
+    QMutexLocker locker(&frameMutex);
+    if (currentFrame) {
+        av_frame_free(&currentFrame);
+    }
+    currentFrame = av_frame_clone(frame.data());
+    videoWidth = frame->width;
+    videoHeight = frame->height;
+
+    //首次接受数据时修改长度
+    static int i=0;
+    if(i==0){
+        updateVertices(width(),height(),videoWidth,videoHeight);
+        i++;
+    }
+    update();
+}
+
+void VideoWidget::VideoWidget::updateVertices(int width, int height,
+                                              int videoWidth, int videoHeight) {
+    float videoAspect = static_cast<float>(videoWidth) / videoHeight;
+    float widgetAspect = static_cast<float>(width) / height;
+
+    float scaleW = 1.0f;
+    float scaleH = 1.0f;
+
+    if (widgetAspect > videoAspect) {
+        scaleW = videoAspect / widgetAspect;
+    } else {
+        scaleH = widgetAspect / videoAspect;
+    }
+
+    GLfloat vertices[] = {// 顶点坐标   // 纹理坐标
+                          -scaleW, -scaleH, 0.0f,   1.0f,   scaleW, -scaleH,
+                          1.0f,    1.0f,    scaleW, scaleH, 1.0f,   0.0f,
+                          -scaleW, scaleH,  0.0f,   0.0f};
+    GLuint indices[] = {0, 1, 2, 2, 3, 0};
+
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                 GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+                          (GLvoid *)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+                          (GLvoid *)(2 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+}
