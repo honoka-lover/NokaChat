@@ -18,7 +18,8 @@ MyMusicPlayer::MyMusicPlayer(QWidget *parent)
     m_currentMusic(""),
     m_durationTime(1),
     audioSlider(nullptr),
-    audioSliderState(false)
+    audioSliderState(false),
+    m_timer(nullptr)
 {
 	ui->setupUi(this);
 

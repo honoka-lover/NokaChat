@@ -17,6 +17,7 @@ extern "C"{
 #include <QWaitCondition>
 #include <QOpenGLExtraFunctions>
 #include "Component/decodethread.h"
+#include "Component/audioplay.h"
 class VideoWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     Q_OBJECT
 
@@ -55,6 +56,7 @@ private:
     QString m_fileName;
     AVFormatContext *m_avFormatCxt;
     DecodeThread *m_decodeThread;
+    AudioPlay* audioPlay;
 
     int videoWidth;
     int videoHeight;

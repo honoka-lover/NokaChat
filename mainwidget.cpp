@@ -14,10 +14,37 @@ MainWidget::MainWidget(QWidget *parent)
     , mymusicplayer(nullptr)
 {
     ui->setupUi(this);
-    auto dir = QApplication::applicationDirPath();
+
+    init();
+
     QFile file(QString(":/myStyle.qss"));
     file.open(QFile::ReadOnly);
     this->setStyleSheet(file.readAll());
+    file.close();
+
+    setComponentVisible();
+
+    ui->frame_2->installEventFilter(this);
+    setMouseTracking(true);
+    this->installEventFilter(this);
+}
+
+MainWidget::~MainWidget()
+{
+    delete ui;
+}
+
+void MainWidget::setComponentVisible()
+{
+    leftUI->hide();
+
+    downlaodTool->hide();
+}
+
+void MainWidget::init()
+{
+    ui->frame->setMinimumWidth(400);
+    ui->frame_2->setMinimumWidth(200);
 
     leftUI = new LeftSideBarButton();
     LeftLayout.addWidget(leftUI);
@@ -25,10 +52,9 @@ MainWidget::MainWidget(QWidget *parent)
     LeftLayout.setSpacing(0);
     LeftLayout.setContentsMargins(0,0,0,0);
     ui->frame->setLayout(&LeftLayout);
-    ui->frame->setMaximumWidth(400);
 
-    rightUI = new downloadSoft();
-    RightLayout.addWidget(rightUI);
+    downlaodTool = new downloadSoft();
+    RightLayout.addWidget(downlaodTool);
 
     mymusicplayer = new MyMusicPlayer();
     RightLayout.addWidget(mymusicplayer);
@@ -37,45 +63,29 @@ MainWidget::MainWidget(QWidget *parent)
     //设置每个每个像素采样样本个数，用于抗锯齿
     format.setSamples(16);
     vedioPlayer = new VideoWidget;
-    vedioPlayer->resize(800, 600);
     vedioPlayer->setFormat(format);
     vedioPlayer->show();
     vedioPlayer->setFileName("../NokaChat/source/test.mp4");
-
+    LeftLayout.addWidget(vedioPlayer);
     vedioPlayer->play();
 
 
 
     ui->frame_2->setLayout(&RightLayout);
 
-
-    QString styleStr = dir + "/../../source/png/1.jpg";
-    qDebug()<<styleStr;
-
     //设置右边背景图片
     ui->frame_2->setObjectName("mainUI");
 
     //设置背景图片
     ui->frame->setObjectName("mainUI2");
-    
 
-
-    file.close();
-
-    ui->frame_2->installEventFilter(this);
-
+    // ui->pushButton->setObjectName("slider");
 
     if(mainFrom == nullptr){
         mainFrom = new MainFrom(ui->frame_2);
         mainFrom->hide();
     }
 
-
-}
-
-MainWidget::~MainWidget()
-{
-    delete ui;
 }
 
 bool MainWidget::eventFilter(QObject *watched, QEvent *event) {
@@ -95,8 +105,7 @@ bool MainWidget::eventFilter(QObject *watched, QEvent *event) {
 
         return true;
     }
-    else
-        return false;
+
 
     return QObject::eventFilter(watched, event);
 }

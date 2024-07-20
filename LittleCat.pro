@@ -14,16 +14,24 @@ INCLUDEPATH += $$PWD/include
 SOURCES += $$files($$PWD/*.cpp) \
     $$files($$PWD/Component/*.cpp,true) \
     $$files($$PWD/Component/musicPlayer/*.cpp,true) \
+    Component/audioplay.cpp \
+    Component/dataqueue.cpp \
     Component/decodethread.cpp \
     Component/videowidget.cpp
 
 HEADERS += $$files($$PWD/*.h) \
     $$files($$PWD/Component/*.h,true)\
     $$files($$PWD/Component/musicPlayer/*.h,true) \
+    Component/audioplay.h \
+    Component/dataqueue.h \
     Component/decodethread.h \
-    Component/videowidget.h
-
-
+    Component/videowidget.h \
+    $$files($$PWD/include/libavforamt/*.h,true)\
+    $$files($$PWD/include/libavcodec/*.h,true)\
+    $$files($$PWD/include/libavutil/*.h,true)\
+    $$files($$PWD/include/libavfilter/*.h,true)\
+    $$files($$PWD/include/libswscale/*.h,true)\
+    $$files($$PWD/include/libswresample/*.h,true)\
 FORMS += $$files($$PWD/*.ui) \
     $$files($$PWD/Component/*.ui,true)\
     $$files($$PWD/Component/musicPlayer/*.ui,true)

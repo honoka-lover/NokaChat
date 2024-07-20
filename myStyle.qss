@@ -41,6 +41,19 @@ QToolButton#trumpt {
     border-image: url(:/source/png/trumpt.png);
 }
 
+QPushButton#slider{
+    color:gray;
+    background-color:black;
+    border:1px gray;
+}
+
+QPushButton#slider:hover{
+    background:#cccccc;
+}
+
+QPushButton#slider:pressed{
+    background:#aaaaaa;
+}
 /*
 QToolButton:hover#musicPlay{
     border-image: url(:/source/png/start.png);

@@ -21,7 +21,7 @@ VideoWidget::VideoWidget(QWidget* parent):
     m_avFormatCxt = nullptr;
     m_decodeThread = new DecodeThread(this);
     connect(m_decodeThread,&DecodeThread::frameDecoded,this,&VideoWidget::setFrame);
-
+    audioPlay = new AudioPlay(m_decodeThread);
     videoWidth=0;
     videoHeight = 0;
 }
@@ -47,6 +47,7 @@ void VideoWidget::setFileName(QString file)
     m_avFormatCxt = open_video_file(m_fileName.toStdString().c_str());
     m_decodeThread->setFormatContext(m_avFormatCxt);
     m_decodeThread->setVideoWidget(this);
+    audioPlay->init();
 }
 
 void VideoWidget::play()
@@ -123,13 +124,14 @@ void VideoWidget::initializeShader() {
         uniform sampler2D textureU;
         uniform sampler2D textureV;
         void main() {
-            float y = texture(textureY, TexCoord).r;
-            float u = texture(textureU, TexCoord).r - 0.5;
-            float v = texture(textureV, TexCoord).r - 0.5;
-            float r = y + 1.402 * v;
-            float g = y - 0.344 * u - 0.714 * v;
-            float b = y + 1.772 * u;
-            FragColor = vec4(r, g, b, 1.0);
+            vec3 yuv,rgb;
+            yuv.x = texture(textureY, TexCoord).r;
+            yuv.y = texture(textureU, TexCoord).r - 0.5;
+            yuv.z = texture(textureV, TexCoord).r - 0.5;
+            rgb = mat3(1,       1,      1,
+                       0, -.34414, 1.772,
+                       1.402, -.71414,      0) * yuv;
+            FragColor = vec4(rgb, 1.0);
         }
         )");
     program->link();

@@ -30,13 +30,17 @@ private:
 
     MainFrom *mainFrom;
 
-    downloadSoft *rightUI;
+    downloadSoft *downlaodTool;
 
     QVBoxLayout LeftLayout,RightLayout;
 
 	MyMusicPlayer* mymusicplayer;
 
     VideoWidget *vedioPlayer;
+
+    void setComponentVisible();
+
+    void init();
 
 protected:
 
