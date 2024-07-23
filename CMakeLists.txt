@@ -3,14 +3,14 @@ project(Vanilla)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # set(CMAKE_PREFIX_PATH "E:/qt6/6.5.2/mingw_64/lib/cmake")
 #set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/mingw_64/lib/cmake")
-set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
+#set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
+set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
 
 
 find_package(Qt6 COMPONENTS
@@ -36,7 +36,8 @@ link_libraries(${LibFile})
 
 add_executable(Vanilla
         ${AllFile}
-        resource.qrc)
+        resource.qrc
+)
 target_link_libraries(Vanilla
         PRIVATE
         Qt::Core

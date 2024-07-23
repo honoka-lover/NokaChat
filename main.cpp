@@ -6,7 +6,7 @@
 
 #include <QSslSocket>
 #include <iostream>
-
+#include <QMediaDevices>
 
 int main(int argc, char *argv[])
 {
@@ -14,8 +14,9 @@ int main(int argc, char *argv[])
 
     qDebug() << QSslSocket::sslLibraryBuildVersionString();
 
-     MainWidget w;
-     w.show();
+    MainWidget w;
+    w.show();
+
     return a.exec();
 }
 

@@ -12,6 +12,7 @@ MainWidget::MainWidget(QWidget *parent)
     , leftUI(nullptr)
     , mainFrom(nullptr)
     , mymusicplayer(nullptr)
+    , openGLWidget(nullptr)
 {
     ui->setupUi(this);
 
@@ -24,6 +25,19 @@ MainWidget::MainWidget(QWidget *parent)
 
     setComponentVisible();
 
+    decode = new DecodeThread(this);
+    decode->bindVideoWidget(vedioPlayer);
+    decode->setFileName("../NokaChat/source/test.mp4");
+    // decode->setFileName("../NokaChat/日南結里,Yunomi - 白猫海賊船.mp3");
+    // decode->setFileName("E:/NokaChat/source/test.wav");
+
+    audioThread = new PlayAudioThread(this);
+    videoThread = new PlayVideoThread(this);
+    decode->bindPlayThread(audioThread,videoThread);
+    connect(videoThread,&PlayVideoThread::frameDecoded,vedioPlayer,&VideoWidget::setFrame);
+    decode->start();
+    audioThread->start();
+    videoThread->start();
     ui->frame_2->installEventFilter(this);
     setMouseTracking(true);
     this->installEventFilter(this);
@@ -39,6 +53,9 @@ void MainWidget::setComponentVisible()
     leftUI->hide();
 
     downlaodTool->hide();
+
+    // vedioPlayer->hide();
+    openGLWidget->hide();
 }
 
 void MainWidget::init()
@@ -65,11 +82,15 @@ void MainWidget::init()
     vedioPlayer = new VideoWidget;
     vedioPlayer->setFormat(format);
     vedioPlayer->show();
-    vedioPlayer->setFileName("../NokaChat/source/test.mp4");
+
     LeftLayout.addWidget(vedioPlayer);
-    vedioPlayer->play();
 
 
+    openGLWidget = new OpenGLWidget(this);
+    openGLWidget->setFormat(format);
+    openGLWidget->StartAnimating();
+
+    LeftLayout.addWidget(openGLWidget);
 
     ui->frame_2->setLayout(&RightLayout);
 
@@ -122,8 +143,6 @@ void MainWidget::paintRect() {
     painter.setPen(pen);
     painter.setBrush(brush);
     painter.drawRect(50,50,200,100);
-
-
 }
 
 

@@ -1,13 +1,6 @@
-#include "videowidget.h"
+#include "Component/videowidget.h"
 #include <QMatrix4x4>
 #include <QDebug>
-AVFormatContext* open_video_file(const char* filename) {
-    AVFormatContext* pFormatContext = avformat_alloc_context();
-    if (avformat_open_input(&pFormatContext, filename, nullptr, nullptr) != 0) {
-        return nullptr;
-    }
-    return pFormatContext;
-}
 
 VideoWidget::VideoWidget(QWidget* parent):
     QOpenGLWidget(parent),
@@ -17,11 +10,7 @@ VideoWidget::VideoWidget(QWidget* parent):
     textureV(nullptr),
     currentFrame(nullptr)
 {
-    m_fileName = "";
     m_avFormatCxt = nullptr;
-    m_decodeThread = new DecodeThread(this);
-    connect(m_decodeThread,&DecodeThread::frameDecoded,this,&VideoWidget::setFrame);
-    audioPlay = new AudioPlay(m_decodeThread);
     videoWidth=0;
     videoHeight = 0;
 }
@@ -32,32 +21,7 @@ VideoWidget::~VideoWidget() {
     if (textureU) delete textureU;
     if (textureV) delete textureV;
     if (currentFrame) av_frame_free(&currentFrame);
-    if (m_decodeThread){
-        m_decodeThread->terminate();
-        delete m_decodeThread;
-    }
-}
 
-void VideoWidget::setFileName(QString file)
-{
-    if(!m_fileName.isEmpty()){
-        avformat_close_input(&m_avFormatCxt);
-    }
-    m_fileName = file;
-    m_avFormatCxt = open_video_file(m_fileName.toStdString().c_str());
-    m_decodeThread->setFormatContext(m_avFormatCxt);
-    m_decodeThread->setVideoWidget(this);
-    audioPlay->init();
-}
-
-void VideoWidget::play()
-{
-    m_decodeThread->start();
-}
-
-void VideoWidget::pause()
-{
-    m_decodeThread->terminate();
 }
 
 void VideoWidget::initializeGL() {
