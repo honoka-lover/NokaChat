@@ -18,6 +18,10 @@ extern "C"{
 #include <QAudioFormat>
 #include <QAudioDevice>
 #include <QAudioSink>
+#include "Component/playaudiothread.h"
+#include "Component/playvideothread.h"
+#include "Component/dataqueue.h"
+#include "Component/videowidget.h"
 class VideoWidget;
 class DecodeThread : public QThread {
     Q_OBJECT
@@ -28,8 +32,13 @@ public:
     DecodeThread(QObject* parent = nullptr);
     ~DecodeThread();
 
+    void setFileName(QString file);
+
     void setFormatContext(AVFormatContext* formatContext);
-    void setVideoWidget(VideoWidget* widget);
+
+    void bindVideoWidget(VideoWidget* widget);
+
+    void bindPlayThread(PlayAudioThread *audio,PlayVideoThread *video);
 
     void seek(int64_t timestamp);
 
@@ -38,9 +47,14 @@ protected:
     void run() override;
 
 private:
-    AVFormatContext* pFormatContext;
+    AVFormatContext* m_avFormatCxt;
     AVCodecContext* videoCodecContext;
     AVCodecContext* audioCodecContext;
+
+    QString m_file;
+
+    DataQueue<AVFrame*> *audioQueue;
+    DataQueue<AVFrame*> *videoQueue;
 
     VideoWidget* videoWidget;
     QMutex mutex;
@@ -48,11 +62,8 @@ private:
     bool stop;
     int videoStreamIndex;
     int audioStreamIndex;
-    double audioClock;  // 用于跟踪音频时钟
 
-
-    // 函数：将音频样本格式转换为 16 位整型
-    int convertAudioFormat(AVFrame* frame, AVCodecContext* codecContext, uint8_t** outputBuffer);
+    void initDecode();
 };
 
 

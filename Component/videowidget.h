@@ -16,8 +16,6 @@ extern "C"{
 #include <QMutex>
 #include <QWaitCondition>
 #include <QOpenGLExtraFunctions>
-#include "Component/decodethread.h"
-#include "Component/audioplay.h"
 class VideoWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     Q_OBJECT
 
@@ -25,12 +23,8 @@ public:
     VideoWidget(QWidget* parent = nullptr);
     ~VideoWidget();
 
-    void setFileName(QString file);
 
-    void play();
-
-    void pause();
-private slots:
+public slots:
     void setFrame(QSharedPointer<AVFrame> frame);
 
 protected:
@@ -53,10 +47,7 @@ private:
     GLuint vbo;
     GLuint ebo;
 
-    QString m_fileName;
     AVFormatContext *m_avFormatCxt;
-    DecodeThread *m_decodeThread;
-    AudioPlay* audioPlay;
 
     int videoWidth;
     int videoHeight;
@@ -67,5 +58,4 @@ private:
     void updateVertices(int width, int height, int videoWidth, int videoHeight);
 };
 
-AVFormatContext* open_video_file(const char* filename);
 #endif // VIDEOWIDGET_H

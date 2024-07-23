@@ -10,6 +10,7 @@
 #include "Component/musicPlayer/mymusicplayer.h"
 #include "Component/OpenGLWidget.h"
 #include "Component/videowidget.h"
+#include "Component/decodethread.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
 QT_END_NAMESPACE
@@ -38,6 +39,12 @@ private:
 
     VideoWidget *vedioPlayer;
 
+    DecodeThread *decode;
+
+    OpenGLWidget *openGLWidget;
+
+    PlayVideoThread *videoThread;
+    PlayAudioThread *audioThread;
     void setComponentVisible();
 
     void init();
