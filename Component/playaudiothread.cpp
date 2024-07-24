@@ -1,19 +1,33 @@
 #include "Component/playaudiothread.h"
 
 #include <QDebug>
-
-PlayAudioThread::PlayAudioThread(QObject* parent)
-    : QThread(parent), audioSink(nullptr), audioIODevice(nullptr), stop(false),
-    audioCodecContext(nullptr), pFormatContext(nullptr), audioStreamIndex(-1) {
-
+#include <QTimer>
+#include <QMediaDevices>
+PlayAudioThread::PlayAudioThread(QObject* parent):
+    QThread(parent),
+    stopFlag(false),
+    quitFlag(false),
+    audioCodecContext(nullptr),
+    pFormatContext(nullptr),
+    audioStreamIndex(-1)
+{
+    audioPlayer = new AudioPlayer;
+    connect(this,&PlayAudioThread::sigAudioData,audioPlayer,&AudioPlayer::audioWrite);
     startTime = av_gettime();
+    stopTime = av_gettime();
+    resumeTime = av_gettime();
     audioPts = AV_NOPTS_VALUE;
 }
 
 PlayAudioThread::~PlayAudioThread() {
-    stop = true;
-    if (audioSink) {
-        audioSink->stop();
+    mutex.lock();
+    stopFlag = false;
+    quitFlag = true;
+    mutex.unlock();
+    condition.wakeAll();
+    if(audioPlayer){
+        audioPlayer->stop();
+        delete audioPlayer;
     }
 }
 
@@ -21,15 +35,12 @@ void PlayAudioThread::setQueues(DataQueue<AVFrame*>* audioQueue) {
     this->audioQueue = audioQueue;
 }
 
-void PlayAudioThread::setAudioSink(QAudioSink* audioSink, QIODevice* audioIODevice) {
-    this->audioSink = audioSink;
-    this->audioIODevice = audioIODevice;
-}
-
 void PlayAudioThread::setCodecContext(AVCodecContext* audioCodecContext, AVFormatContext* pFormatContext, int audioStreamIndex) {
     this->audioCodecContext = audioCodecContext;
     this->pFormatContext = pFormatContext;
     this->audioStreamIndex = audioStreamIndex;
+
+    init();
 }
 
 int64_t PlayAudioThread::getAudioPts()
@@ -37,47 +48,117 @@ int64_t PlayAudioThread::getAudioPts()
     return this->audioPts;
 }
 
+void PlayAudioThread::pause()
+{
+    mutex.lock();
+    stopFlag = true;
+    stopTime = av_gettime();
+    mutex.unlock();
+//    audioPlayer->stop();
+}
+
 void PlayAudioThread::run() {
-    if(audioStreamIndex < 0){
-        qDebug()<<"没有音频数据流，音频播放线程退出";
-        return;
-    }
-    while(true){
+    while (!isInterruptionRequested()) {
+        {
+            QMutexLocker locker(&mutex);
+            if (stopFlag) {
+                condition.wait(&mutex);
+            }
+            if(quitFlag)
+                return;
+        }
+        if(audioStreamIndex == -1){
+            QThread::usleep(10000);
+        }else if(audioStreamIndex < 0){
+            qDebug()<<"没有音频数据流，音频播放线程退出";
+            return;
+        }
         if(!playAudio())
-            msleep(10);
+            QThread::usleep(10000);
+    }
+    exec();
+}
+
+void PlayAudioThread::init()
+{
+    if(!audioCodecContext){
+        return;
+    }else if(!bindDevice){
+        // 初始化音频输出设备
+        QAudioFormat format;
+        format.setSampleRate(audioCodecContext->sample_rate);
+        format.setChannelCount(audioCodecContext->ch_layout.nb_channels);
+        // 设置样本格式
+        format.setSampleFormat(QAudioFormat::Int16);
+        // format.setChannelConfig(audioCodecContext->ch_layout.order)
+
+        QAudioDevice audioDevice = QMediaDevices::defaultAudioOutput();
+        auto audioSink = new QAudioSink(audioDevice, format);
+
+        auto audioIODevice = audioSink->start();
+
+        audioPlayer->setAudioSink(audioSink,audioIODevice);
+        bindDevice = true;
     }
 }
 
 
 bool PlayAudioThread::playAudio() {
     if (!audioQueue->empty()) {
-        AVFrame* audioFrame = audioQueue->pop();
-        // // 转换音频数据为 PCM 并写入 audioIODevice
-        uint8_t* outputBuffer = nullptr;
-        int result = convertAudioFormat(audioFrame, audioCodecContext, &outputBuffer);
-        if (result >= 0 && outputBuffer) {
-            int data_size = av_samples_get_buffer_size(nullptr, audioCodecContext->ch_layout.nb_channels, audioFrame->nb_samples, AV_SAMPLE_FMT_S16, 0);
+        AVFrame *audioFrame;
+        bool ok = audioQueue->pop(audioFrame);
+        if (ok) {
+            // 转换音频数据为 PCM 并写入 audioIODevice
+            uint8_t *outputBuffer = nullptr;
+            int result = convertAudioFormat(audioFrame, audioCodecContext, &outputBuffer);
+            if (result >= 0 && outputBuffer) {
+                int data_size = av_samples_get_buffer_size(nullptr, audioCodecContext->ch_layout.nb_channels,
+                                                           audioFrame->nb_samples, AV_SAMPLE_FMT_S16, 0);
 
-            // 获取帧的 PTS
-            if (audioPts == AV_NOPTS_VALUE) {
-                audioPts = audioFrame->pts;
+                // 获取帧的 PTS
+                if (audioPts == AV_NOPTS_VALUE) {
+                    audioPts = audioFrame->pts;
+                }
+
+                int64_t delay =
+                        (audioFrame->pts - audioPts) * av_q2d(pFormatContext->streams[audioStreamIndex]->time_base) *
+                        1000000;
+                int64_t currentTime = av_gettime() - startTime;
+                int64_t sleepTime = delay - currentTime;
+                if (sleepTime > 0) {
+                    QThread::usleep(sleepTime);
+                }
+
+                emit sigAudioData((char *) outputBuffer, data_size);
+                av_free(outputBuffer);
             }
-
-            int64_t delay = (audioFrame->pts - audioPts) * av_q2d(pFormatContext->streams[audioStreamIndex]->time_base) * 1000000;
-            int64_t currentTime = av_gettime() - startTime;
-            int64_t sleepTime = delay-currentTime;
-            if (sleepTime>0) {
-                QThread::usleep(sleepTime);
-            }
-
-
-            audioIODevice->write((char*)outputBuffer, data_size);
-            av_free(outputBuffer);
-        }
-        av_frame_free(&audioFrame);
-        return true;
+            av_frame_free(&audioFrame);
+            return true;
+        } else
+            return false;
     }else
-        return false;
+            return false;
+
+}
+
+void PlayAudioThread::resume() {
+    QMutexLocker locker(&mutex);
+    stopFlag = false;
+    resumeTime = av_gettime();
+    startTime = startTime + resumeTime -stopTime;
+//    audioPlayer->resume();
+    condition.wakeAll();
+}
+
+void PlayAudioThread::stop() {
+    QMutexLocker locker(&mutex);
+    stopFlag = false;
+    quitFlag = true;
+    if(audioPlayer)
+        audioPlayer->stop();
+    delete audioPlayer;
+    audioPlayer = nullptr;
+    condition.wakeAll();
 }
 
 int convertAudioFormat(AVFrame *frame, AVCodecContext *codecContext, uint8_t **outputBuffer) {

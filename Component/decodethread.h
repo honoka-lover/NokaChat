@@ -10,7 +10,7 @@ extern "C"{
 #include <libavutil/opt.h>
 #include <libavutil/channel_layout.h>
 }
-
+#include <QTimer>
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
@@ -34,6 +34,8 @@ public:
 
     void setFileName(QString file);
 
+    QString getFileName();
+
     void setFormatContext(AVFormatContext* formatContext);
 
     void bindVideoWidget(VideoWidget* widget);
@@ -43,6 +45,10 @@ public:
     void seek(int64_t timestamp);
 
     AVCodecContext* getAudioCodecContext();
+
+    void pause();
+    void resume();
+    void stop();
 protected:
     void run() override;
 
@@ -59,9 +65,13 @@ private:
     VideoWidget* videoWidget;
     QMutex mutex;
     QWaitCondition condition;
-    bool stop;
+    bool stopFlag;
+    bool quitFlag;
     int videoStreamIndex;
     int audioStreamIndex;
+
+    PlayAudioThread *audioThread;
+    PlayVideoThread *videoThread;
 
     void initDecode();
 };

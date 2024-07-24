@@ -19,22 +19,24 @@ extern "C"{
 template <typename T>
 class DataQueue {
 public:
-    DataQueue(size_t maxSize = 100) : maxSize(maxSize) {}
+    DataQueue(size_t maxSize = 100) : maxSize(maxSize),stopped(false) {}
 
     void push(T item) {
         std::unique_lock<std::mutex> lock(mutex);
-        cond.wait(lock, [this]() { return queue.size() < maxSize; });
+        cond.wait(lock, [this]() { return queue.size() < maxSize || stopped; });
+        if (stopped) return;
         queue.push(item);
         cond.notify_all();
     }
 
-    T pop() {
+    bool pop(T& item) {
         std::unique_lock<std::mutex> lock(mutex);
-        cond.wait(lock, [this]() { return !queue.empty(); });
-        T item = queue.front();
+        cond.wait(lock, [this]() { return !queue.empty() || stopped; });
+        if (stopped && queue.empty()) return false;
+        item = queue.front();
         queue.pop();
         cond.notify_all();
-        return item;
+        return true;
     }
 
     bool empty() const {
@@ -42,11 +44,17 @@ public:
         return queue.empty();
     }
 
+    void stop() {
+        std::unique_lock<std::mutex> lock(mutex);
+        stopped = true;
+        cond.notify_all();
+    }
 private:
     std::queue<T> queue;
     mutable std::mutex mutex;
     std::condition_variable cond;
     size_t maxSize;
+    std::atomic<bool> stopped;
 };
 
 // #include<QSharedPointer>

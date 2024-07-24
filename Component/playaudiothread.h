@@ -11,38 +11,52 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 #include <QSharedPointer>
-#include <QTimer>
-
+#include <Component/audioplayer.h>
+#include <QMutex>
+#include <QWaitCondition>
 class PlayAudioThread : public QThread {
     Q_OBJECT
+
+signals:
+    void sigAudioData(const char*,int);
 public:
     PlayAudioThread(QObject* parent = nullptr);
     ~PlayAudioThread();
 
     void setQueues(DataQueue<AVFrame*>* audioQueue);
-    void setAudioSink(QAudioSink* audioSink, QIODevice* audioIODevice);
+
     void setCodecContext(AVCodecContext* audioCodecContext, AVFormatContext* pFormatContext, int audioStreamIndex);
 
     int64_t getAudioPts();
 
+    void pause();
+
+    void resume();
+
+    void stop();
+public slots:
+    bool playAudio();
 protected:
     void run() override;
 
 private:
-    bool playAudio();
-
     DataQueue<AVFrame*>* audioQueue;
-    QAudioSink* audioSink;
-    QIODevice* audioIODevice;
-    bool stop;
-
+    bool stopFlag;
+    bool quitFlag;
     AVCodecContext* audioCodecContext;
     AVFormatContext* pFormatContext;
     int audioStreamIndex;
 
     int64_t startTime;
+    int64_t stopTime;
+    int64_t resumeTime;
     int64_t audioPts;
     // int64_t videoPts;
+    bool bindDevice = false;
+    void init();
+    QMutex mutex;
+    QWaitCondition condition;
+    AudioPlayer *audioPlayer;
 };
 
 // 函数：将音频样本格式转换为 16 位整型

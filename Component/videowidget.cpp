@@ -1,7 +1,9 @@
 #include "Component/videowidget.h"
 #include <QMatrix4x4>
 #include <QDebug>
-
+#include <QKeyEvent>
+#include <QEvent>
+#include <QMouseEvent>
 VideoWidget::VideoWidget(QWidget* parent):
     QOpenGLWidget(parent),
     program(nullptr),
@@ -13,6 +15,10 @@ VideoWidget::VideoWidget(QWidget* parent):
     m_avFormatCxt = nullptr;
     videoWidth=0;
     videoHeight = 0;
+
+    installEventFilter(this);
+    //捕获键盘输入
+    this->grabKeyboard();
 }
 
 VideoWidget::~VideoWidget() {
@@ -170,6 +176,12 @@ void VideoWidget::paintGL() {
         glBindVertexArray(0);
         program->release();
     }
+}
+
+void VideoWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    qDebug()<<"全屏";
+    emit fullScreen();
 }
 
 void VideoWidget::setFrame(QSharedPointer<AVFrame> frame) {

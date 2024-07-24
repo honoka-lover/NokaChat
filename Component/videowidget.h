@@ -18,7 +18,8 @@ extern "C"{
 #include <QOpenGLExtraFunctions>
 class VideoWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     Q_OBJECT
-
+signals:
+    void fullScreen();
 public:
     VideoWidget(QWidget* parent = nullptr);
     ~VideoWidget();
@@ -32,6 +33,7 @@ protected:
     void resizeGL(int w, int h) override;
     void paintGL() override;
 
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 private:
     QOpenGLShaderProgram* program;
     QOpenGLTexture* textureY;

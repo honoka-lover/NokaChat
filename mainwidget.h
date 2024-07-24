@@ -11,6 +11,7 @@
 #include "Component/OpenGLWidget.h"
 #include "Component/videowidget.h"
 #include "Component/decodethread.h"
+#include "Component/videolist.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
 QT_END_NAMESPACE
@@ -37,7 +38,7 @@ private:
 
 	MyMusicPlayer* mymusicplayer;
 
-    VideoWidget *vedioPlayer;
+    VideoWidget *videoPlayer;
 
     DecodeThread *decode;
 
@@ -45,6 +46,10 @@ private:
 
     PlayVideoThread *videoThread;
     PlayAudioThread *audioThread;
+
+    VideoList *videoList;
+
+    bool isPlay = false;
     void setComponentVisible();
 
     void init();
@@ -54,6 +59,10 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
     void paintRect();
+
+private slots:
+    void playFile(QString file);
+
 };
 
 #endif // MAINWIDGET_H

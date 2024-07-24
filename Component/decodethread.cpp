@@ -1,6 +1,6 @@
 #include "decodethread.h"
 #include <QDebug>
-
+#include <QTimer>
 #include <QMediaDevices>
 AVFormatContext* open_video_file(const char* filename) {
     AVFormatContext* pFormatContext = avformat_alloc_context();
@@ -15,9 +15,13 @@ DecodeThread::DecodeThread(QObject* parent)
     m_avFormatCxt(nullptr),
     audioCodecContext(nullptr),
     videoWidget(nullptr),
-    stop(false),
+    stopFlag(false),
     videoStreamIndex(-1),
-    audioStreamIndex(-1)
+    audioStreamIndex(-1),
+    videoThread(nullptr),
+    audioThread(nullptr),
+    m_file(""),
+    quitFlag(false)
 {
     size_t maxQueueSize = 100; // Set the maximum queue size
     audioQueue = new DataQueue<AVFrame*>(100);
@@ -26,6 +30,7 @@ DecodeThread::DecodeThread(QObject* parent)
 }
 
 DecodeThread::~DecodeThread() {
+    mutex.lock();
     if (videoCodecContext) {
         avcodec_free_context(&videoCodecContext);
     }
@@ -36,12 +41,27 @@ DecodeThread::~DecodeThread() {
         avformat_close_input(&m_avFormatCxt);
         avformat_free_context(m_avFormatCxt);
     }
-
-    mutex.lock();
-    stop = true;
+    stopFlag = false;
+    quitFlag = true;
     condition.wakeOne();
     mutex.unlock();
     wait();
+    audioQueue->stop();
+    while(!audioQueue->empty()){
+        AVFrame *frame;
+        bool ok = audioQueue->pop(frame);
+        if(ok)
+            av_frame_free(&frame);
+    }
+    videoQueue->stop();
+    while(!videoQueue->empty()){
+        AVFrame *frame;
+        bool ok = videoQueue->pop(frame);
+        if(ok)
+            av_frame_free(&frame);
+    }
+
+
 }
 
 void DecodeThread::setFileName(QString file)
@@ -75,10 +95,6 @@ void DecodeThread::initDecode() {
 
     }
 
-
-
-
-
 }
 
 void DecodeThread::bindVideoWidget(VideoWidget* widget) {
@@ -90,25 +106,15 @@ void DecodeThread::bindVideoWidget(VideoWidget* widget) {
 void DecodeThread::bindPlayThread(PlayAudioThread *audio,PlayVideoThread *video)
 {
     if(audio){
-        // 初始化音频输出设备
-        QAudioFormat format;
-        format.setSampleRate(audioCodecContext->sample_rate);
-        format.setChannelCount(audioCodecContext->ch_layout.nb_channels);
-        // 设置样本格式
-        format.setSampleFormat(QAudioFormat::Int16);
-        // format.setChannelConfig(audioCodecContext->ch_layout.order)
-
-        QAudioDevice audioDevice = QMediaDevices::defaultAudioOutput();
-        QAudioSink* audioSink = new QAudioSink(audioDevice, format);
-        QIODevice* audioIODevice = audioSink->start();
         audio->setQueues(audioQueue);
-        audio->setAudioSink(audioSink, audioIODevice);
         audio->setCodecContext(audioCodecContext, m_avFormatCxt, audioStreamIndex);
+        audioThread = audio;
     }
     if(video){
         video->setQueues(videoQueue);
         video->setCodecContext(m_avFormatCxt, videoStreamIndex);
         video->bindAudio(audio);
+        videoThread = video;
     }
 
 }
@@ -119,7 +125,7 @@ void DecodeThread::seek(int64_t timestamp) {
         av_seek_frame(m_avFormatCxt, videoStreamIndex, timestamp, AVSEEK_FLAG_BACKWARD);
         avcodec_flush_buffers(videoCodecContext);
         avcodec_flush_buffers(audioCodecContext);
-        condition.wakeOne();
+        // condition.wakeOne();
     }
 }
 
@@ -128,11 +134,23 @@ AVCodecContext *DecodeThread::getAudioCodecContext()
     return this->audioCodecContext;
 }
 
+void DecodeThread::pause()
+{
+    mutex.lock();
+    stopFlag = true;
+    mutex.unlock();
+}
+
 void DecodeThread::run() {
-    while (!stop) {
-        mutex.lock();
-        if (!m_avFormatCxt) {
-            condition.wait(&mutex);
+    while (!isInterruptionRequested()) {
+        {
+            QMutexLocker locker(&mutex);
+            if (stopFlag) {
+                condition.wait(&mutex);
+            }
+            if(quitFlag){
+                return;
+            }
         }
         AVPacket* pPacket = av_packet_alloc();
         AVFrame* pFrame = av_frame_alloc();
@@ -149,7 +167,6 @@ void DecodeThread::run() {
                     while (avcodec_receive_frame(audioCodecContext, pFrame) >= 0) {
                         AVFrame* frame = av_frame_clone(pFrame);
                         audioQueue->push(frame);
-
                     }
                 }
             }
@@ -158,6 +175,26 @@ void DecodeThread::run() {
         }
         av_frame_free(&pFrame);
         av_packet_free(&pPacket);
-        mutex.unlock();
     }
+}
+
+QString DecodeThread::getFileName() {
+    return this->m_file;
+}
+
+void DecodeThread::stop() {
+    QMutexLocker locker(&mutex);
+    stopFlag = false;
+    quitFlag = true;
+    audioThread->stop();
+    videoThread->stop();
+    audioQueue->stop();
+    videoQueue->stop();
+    condition.wakeAll();
+}
+
+void DecodeThread::resume() {
+    QMutexLocker locker(&mutex);
+    stopFlag = false;
+    condition.wakeAll();
 }

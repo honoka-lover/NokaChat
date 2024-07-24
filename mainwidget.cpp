@@ -6,6 +6,7 @@
 #include <QPainter>
 #include "QTimer"
 #include "Component/videowidget.h"
+#include <QToolButton>
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget)
@@ -13,6 +14,9 @@ MainWidget::MainWidget(QWidget *parent)
     , mainFrom(nullptr)
     , mymusicplayer(nullptr)
     , openGLWidget(nullptr)
+    , decode(nullptr)
+    , audioThread(nullptr)
+    , videoThread(nullptr)
 {
     ui->setupUi(this);
 
@@ -25,19 +29,8 @@ MainWidget::MainWidget(QWidget *parent)
 
     setComponentVisible();
 
-    decode = new DecodeThread(this);
-    decode->bindVideoWidget(vedioPlayer);
-    decode->setFileName("../NokaChat/source/test.mp4");
-    // decode->setFileName("../NokaChat/日南結里,Yunomi - 白猫海賊船.mp3");
-    // decode->setFileName("E:/NokaChat/source/test.wav");
 
-    audioThread = new PlayAudioThread(this);
-    videoThread = new PlayVideoThread(this);
-    decode->bindPlayThread(audioThread,videoThread);
-    connect(videoThread,&PlayVideoThread::frameDecoded,vedioPlayer,&VideoWidget::setFrame);
-    decode->start();
-    audioThread->start();
-    videoThread->start();
+    connect(videoList,&VideoList::sigFileName,this,&MainWidget::playFile);
     ui->frame_2->installEventFilter(this);
     setMouseTracking(true);
     this->installEventFilter(this);
@@ -45,6 +38,24 @@ MainWidget::MainWidget(QWidget *parent)
 
 MainWidget::~MainWidget()
 {
+    if(decode){
+        decode->stop();
+        decode->wait();
+        delete decode;
+    }
+    if(audioThread){
+        audioThread->stop();
+        audioThread->wait();
+        delete audioThread;
+    }
+    if(videoThread) {
+        videoThread->stop();
+        videoThread->wait();
+        delete videoThread;
+    }
+    if(videoPlayer){
+        delete videoPlayer;
+    }
     delete ui;
 }
 
@@ -54,8 +65,11 @@ void MainWidget::setComponentVisible()
 
     downlaodTool->hide();
 
-    // vedioPlayer->hide();
+    mymusicplayer->hide();
+    // videoPlayer->hide();
     openGLWidget->hide();
+
+//    videoList->hide();
 }
 
 void MainWidget::init()
@@ -65,47 +79,51 @@ void MainWidget::init()
 
     leftUI = new LeftSideBarButton();
     LeftLayout.addWidget(leftUI);
-    leftUI->show();
     LeftLayout.setSpacing(0);
     LeftLayout.setContentsMargins(0,0,0,0);
-    ui->frame->setLayout(&LeftLayout);
+    RightLayout.setSpacing(0);
+    RightLayout.setContentsMargins(0,0,0,0);
 
-    downlaodTool = new downloadSoft();
+    downlaodTool = new downloadSoft(this);
     RightLayout.addWidget(downlaodTool);
 
-    mymusicplayer = new MyMusicPlayer();
+    mymusicplayer = new MyMusicPlayer(this);
     RightLayout.addWidget(mymusicplayer);
 
     QSurfaceFormat format;
     //设置每个每个像素采样样本个数，用于抗锯齿
     format.setSamples(16);
-    vedioPlayer = new VideoWidget;
-    vedioPlayer->setFormat(format);
-    vedioPlayer->show();
+    videoPlayer = new VideoWidget(this);
+    videoPlayer->setFormat(format);
+    videoPlayer->show();
 
-    LeftLayout.addWidget(vedioPlayer);
+    LeftLayout.addWidget(videoPlayer);
 
 
     openGLWidget = new OpenGLWidget(this);
     openGLWidget->setFormat(format);
     openGLWidget->StartAnimating();
 
+    videoList = new VideoList(this);
+    RightLayout.addWidget(videoList);
+
     LeftLayout.addWidget(openGLWidget);
 
+    ui->frame->setLayout(&LeftLayout);
     ui->frame_2->setLayout(&RightLayout);
 
-    //设置右边背景图片
-    ui->frame_2->setObjectName("mainUI");
-
-    //设置背景图片
-    ui->frame->setObjectName("mainUI2");
+//    //设置右边背景图片
+//    ui->frame_2->setObjectName("mainUI");
+//
+//    //设置背景图片
+//    ui->frame->setObjectName("mainUI2");
 
     // ui->pushButton->setObjectName("slider");
 
-    if(mainFrom == nullptr){
-        mainFrom = new MainFrom(ui->frame_2);
-        mainFrom->hide();
-    }
+//    if(mainFrom == nullptr){
+//        mainFrom = new MainFrom(ui->frame_2);
+//        mainFrom->hide();
+//    }
 
 }
 
@@ -124,7 +142,44 @@ bool MainWidget::eventFilter(QObject *watched, QEvent *event) {
 //        QRectF rectangle(10.0, 20.0, 80.0, 80.0);    // 圆形所在矩形位置和大小
 //        painter.drawEllipse(rectangle);
 
-        return true;
+        return false;
+    }else if(watched == this && event->type() == QEvent::KeyPress){
+        QKeyEvent *e = (QKeyEvent*)event;
+        switch(e->key()){
+        case Qt::Key_Space:
+//            qDebug()<<"暂停";
+            if(decode){
+                if(!isPlay){
+                    isPlay = true;
+                    decode->resume();
+                }else{
+                    isPlay = false;
+                    decode->pause();
+                }
+            }
+            if(audioThread){
+                if(!isPlay){
+                    isPlay = true;
+                    audioThread->resume();
+                }else{
+                    isPlay = false;
+                    audioThread->pause();
+                }
+            }
+            if(videoThread){
+                if(!isPlay){
+                    isPlay = true;
+                    videoThread->resume();
+                }else{
+                    isPlay = false;
+                    videoThread->pause();
+                }
+            }
+            break;
+        case Qt::Key_Escape:
+            qDebug()<<"退出全屏";
+            break;
+        }
     }
 
 
@@ -143,6 +198,38 @@ void MainWidget::paintRect() {
     painter.setPen(pen);
     painter.setBrush(brush);
     painter.drawRect(50,50,200,100);
+}
+
+void MainWidget::playFile(QString file)
+{
+    if(decode){
+        if(decode->getFileName() == file)
+            return;
+        decode->stop();
+        decode->quit();
+        decode->wait();
+        videoThread->quit();
+        videoThread->wait();
+        audioThread->quit();
+        audioThread->wait();
+        delete decode;
+        delete videoThread;
+        delete audioThread;
+    }
+    isPlay = true;
+    decode = new DecodeThread(this);
+    decode->bindVideoWidget(videoPlayer);
+    decode->setFileName(file);
+    // decode->setFileName("../NokaChat/日南結里,Yunomi - 白猫海賊船.mp3");
+    // decode->setFileName("E:/NokaChat/source/test.wav");
+
+    audioThread = new PlayAudioThread(this);
+    videoThread = new PlayVideoThread(this);
+    decode->bindPlayThread(audioThread,videoThread);
+    connect(videoThread,&PlayVideoThread::frameDecoded,videoPlayer,&VideoWidget::setFrame);
+    decode->start();
+    audioThread->start();
+    videoThread->start();
 }
 
 
