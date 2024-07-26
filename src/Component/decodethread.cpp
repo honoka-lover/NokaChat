@@ -15,13 +15,14 @@ DecodeThread::DecodeThread(QObject* parent)
     m_avFormatCxt(nullptr),
     audioCodecContext(nullptr),
     videoWidget(nullptr),
-    stopFlag(false),
     videoStreamIndex(-1),
     audioStreamIndex(-1),
     videoThread(nullptr),
     audioThread(nullptr),
     m_file(""),
-    quitFlag(false)
+    seekTime(0),
+    stopped(false),
+    seekRequested(false)
 {
     size_t maxQueueSize = 100; // Set the maximum queue size
     audioQueue = new DataQueue<AVFrame*>(100);
@@ -41,9 +42,6 @@ DecodeThread::~DecodeThread() {
         avformat_close_input(&m_avFormatCxt);
         avformat_free_context(m_avFormatCxt);
     }
-    stopFlag = false;
-    quitFlag = true;
-    condition.wakeOne();
     mutex.unlock();
     wait();
     audioQueue->stop();
@@ -60,8 +58,6 @@ DecodeThread::~DecodeThread() {
         if(ok)
             av_frame_free(&frame);
     }
-
-
 }
 
 void DecodeThread::setFileName(QString file)
@@ -72,6 +68,21 @@ void DecodeThread::setFileName(QString file)
     m_file = file;
     m_avFormatCxt = open_video_file(m_file.toStdString().c_str());
     initDecode();
+    // 如果duration为负数，手动计算总时长
+    if (m_avFormatCxt->duration < 0) {
+        int64_t maxDuration = 0;
+        for (unsigned int i = 0; i < m_avFormatCxt->nb_streams; ++i) {
+            AVStream *stream = m_avFormatCxt->streams[i];
+            if (stream->duration != AV_NOPTS_VALUE) {
+                int64_t duration = av_rescale_q(stream->duration, stream->time_base, AV_TIME_BASE_Q);
+                maxDuration = std::max(maxDuration, duration);
+            }
+        }
+        m_avFormatCxt->duration = maxDuration;
+    }
+    if(videoWidget){
+        videoWidget->setAllTime(m_avFormatCxt->duration);
+    }
 }
 
 void DecodeThread::initDecode() {
@@ -121,12 +132,8 @@ void DecodeThread::bindPlayThread(PlayAudioThread *audio,PlayVideoThread *video)
 
 void DecodeThread::seek(int64_t timestamp) {
     QMutexLocker locker(&mutex);
-    if (m_avFormatCxt) {
-        av_seek_frame(m_avFormatCxt, videoStreamIndex, timestamp, AVSEEK_FLAG_BACKWARD);
-        avcodec_flush_buffers(videoCodecContext);
-        avcodec_flush_buffers(audioCodecContext);
-        // condition.wakeOne();
-    }
+    seekRequested = true;
+    seekTime = timestamp;
 }
 
 AVCodecContext *DecodeThread::getAudioCodecContext()
@@ -136,45 +143,89 @@ AVCodecContext *DecodeThread::getAudioCodecContext()
 
 void DecodeThread::pause()
 {
-    mutex.lock();
-    stopFlag = true;
-    mutex.unlock();
+    stopped = true;
 }
 
 void DecodeThread::run() {
     while (!isInterruptionRequested()) {
-        {
+        if (seekRequested) {
             QMutexLocker locker(&mutex);
-            if (stopFlag) {
-                condition.wait(&mutex);
-            }
-            if(quitFlag){
-                return;
-            }
-        }
-        AVPacket* pPacket = av_packet_alloc();
-        AVFrame* pFrame = av_frame_alloc();
-        if (av_read_frame(m_avFormatCxt, pPacket) >= 0) {
-            if (pPacket->stream_index == videoStreamIndex) {
-                if (avcodec_send_packet(videoCodecContext, pPacket) >= 0) {
-                    while (avcodec_receive_frame(videoCodecContext, pFrame) >= 0) {
-                        AVFrame* frame = av_frame_clone(pFrame);
-                        videoQueue->push(frame);
-                    }
-                }
-            }else if (pPacket->stream_index == audioStreamIndex) {
-                if (avcodec_send_packet(audioCodecContext, pPacket) >= 0) {
-                    while (avcodec_receive_frame(audioCodecContext, pFrame) >= 0) {
-                        AVFrame* frame = av_frame_clone(pFrame);
-                        audioQueue->push(frame);
-                    }
-                }
-            }
+            av_seek_frame(m_avFormatCxt, -1, seekTime, AVSEEK_FLAG_BACKWARD);
+            avcodec_flush_buffers(audioCodecContext);
+            avcodec_flush_buffers(videoCodecContext);
 
-            av_packet_unref(pPacket);
+            while(!audioQueue->empty()){
+                AVFrame *frame;
+                bool ok = audioQueue->pop(frame);
+                if(ok)
+                    av_frame_free(&frame);
+            }
+            videoQueue->stop();
+            while(!videoQueue->empty()){
+                AVFrame *frame;
+                bool ok = videoQueue->pop(frame);
+                if(ok)
+                    av_frame_free(&frame);
+            }
+            seekRequested = false;
         }
-        av_frame_free(&pFrame);
-        av_packet_free(&pPacket);
+
+        if (stopped) {
+            QThread::msleep(10);
+            continue;
+        }
+
+        AVPacket* packet = av_packet_alloc();
+        if (av_read_frame(m_avFormatCxt, packet) >= 0) {
+            if (packet->stream_index == audioStreamIndex) {
+                AVFrame* frame = av_frame_alloc();
+                int ret = avcodec_send_packet(audioCodecContext, packet);
+                if (ret >= 0) {
+                    ret = avcodec_receive_frame(audioCodecContext, frame);
+                    if (ret >= 0) {
+                        audioQueue->push(frame);
+                    } else {
+                        av_frame_free(&frame);
+                    }
+                } else {
+                    av_frame_free(&frame);
+                }
+            } else if (packet->stream_index == videoStreamIndex) {
+                AVFrame* frame = av_frame_alloc();
+                int ret = avcodec_send_packet(videoCodecContext, packet);
+                if (ret >= 0) {
+                    ret = avcodec_receive_frame(videoCodecContext, frame);
+                    if (ret >= 0) {
+                        videoQueue->push(frame);
+                    } else {
+                        av_frame_free(&frame);
+                    }
+                } else {
+                    av_frame_free(&frame);
+                }
+            }
+            av_packet_unref(packet);
+        }
+        av_packet_free(&packet);
+//            if (pPacket->stream_index == videoStreamIndex) {
+//                if (avcodec_send_packet(videoCodecContext, pPacket) >= 0) {
+//                    while (avcodec_receive_frame(videoCodecContext, pFrame) >= 0) {
+//                        AVFrame* frame = av_frame_clone(pFrame);
+//                        videoQueue->push(frame);
+//                    }
+//                }
+//            }else if (pPacket->stream_index == audioStreamIndex) {
+//                if (avcodec_send_packet(audioCodecContext, pPacket) >= 0) {
+//                    while (avcodec_receive_frame(audioCodecContext, pFrame) >= 0) {
+//                        AVFrame* frame = av_frame_clone(pFrame);
+//                        audioQueue->push(frame);
+//                    }
+//                }
+//            }
+//
+//            av_packet_unref(pPacket);
+//        }
+
     }
 }
 
@@ -183,18 +234,12 @@ QString DecodeThread::getFileName() {
 }
 
 void DecodeThread::stop() {
-    QMutexLocker locker(&mutex);
-    stopFlag = false;
-    quitFlag = true;
-    audioThread->stop();
-    videoThread->stop();
     audioQueue->stop();
     videoQueue->stop();
-    condition.wakeAll();
+    requestInterruption();
+    resume();
 }
 
 void DecodeThread::resume() {
-    QMutexLocker locker(&mutex);
-    stopFlag = false;
-    condition.wakeAll();
+    stopped = false;
 }

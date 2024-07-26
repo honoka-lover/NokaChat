@@ -36,5 +36,5 @@ void AudioPlayer::audioWrite(const char *data, int len)
 
 void AudioPlayer::resume() {
     if(audioSink)
-        audioSink->resume();
+        audioIODevice = audioSink->start();
 }

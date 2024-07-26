@@ -23,20 +23,53 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 
 
-include_directories( .
-        ./Component
-        ./include
-)
+# 设置源文件目录
+set(SRC_DIR "src")
 
-file(GLOB AllFile "./*.h" "./*.cpp" "./Component/*.h" "./Component/*.cpp" "./*.ui" "./Component/*.ui" "./Component/musicPlayer/*.h" "./Component/musicPlayer/*.cpp" "./Component/musicPlayer/*.ui")
+set(INCLUDE_DIR "include")
+# 定义一个函数来递归获取目录中的所有文件
+function(get_all_files_in_directory DIR RESULT)
+    file(GLOB_RECURSE ALL_FILES "${DIR}/*.h" "${DIR}/*.cpp" "${DIR}/*.ui" )
 
+    set(${RESULT} ${ALL_FILES} PARENT_SCOPE)
+endfunction()
+
+# 调用函数以获取所有文件
+get_all_files_in_directory(${SRC_DIR} ALL_SRC_FILES)
+
+get_all_files_in_directory(${INCLUDE_DIR} ALL_HEAD_FILES)
+# 创建一个新的列表来存储过滤后的文件
+set(FILTERED_SRC_FILES)
+set(FILTERED_HEAD_FILES)
+# 遍历所有文件
+foreach(FILE ${ALL_SRC_FILES})
+    # 获取文件名
+    get_filename_component(FILENAME ${FILE} NAME)
+
+    # 检查文件名是否以 ui_ 开头
+    if(NOT FILENAME MATCHES "^ui_")
+        # 如果不是，则将其添加到过滤后的文件列表中
+        list(APPEND FILTERED_SRC_FILES ${FILE})
+    endif()
+endforeach()
+#遍历include中头文件
+foreach(FILE ${ALL_HEAD_FILES})
+    # 获取文件名
+    get_filename_component(FILENAME ${FILE} NAME)
+    list(APPEND FILTERED_HEAD_FILES ${FILE})
+endforeach()
+
+# 打印过滤后的文件列表（可选，用于调试）
+message(STATUS "Filtered source files: ${FILTERED_SRC_FILES}")
+
+include_directories(src include)
 file(GLOB LibFile "lib/*.lib")
-
 link_libraries(${LibFile})
 
 add_executable(Vanilla
-        ${AllFile}
-        resource.qrc
+        ${FILTERED_SRC_FILES}
+        ${FILTERED_HEAD_FILES}
+        source/resource.qrc
 )
 target_link_libraries(Vanilla
         PRIVATE
@@ -48,34 +81,3 @@ target_link_libraries(Vanilla
         Qt::OpenGLWidgets
 )
 
-
-
-#
-#if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-#    set(DEBUG_SUFFIX)
-#    if (MSVC AND CMAKE_BUILD_TYPE MATCHES "Debug")
-#        set(DEBUG_SUFFIX "d")
-#    endif ()
-#    set(QT_INSTALL_PATH "${CMAKE_PREFIX_PATH}")
-#    if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
-#        set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
-#        if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
-#            set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
-#        endif ()
-#    endif ()
-#    if (EXISTS "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll")
-#        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#                COMMAND ${CMAKE_COMMAND} -E make_directory
-#                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
-#        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#                COMMAND ${CMAKE_COMMAND} -E copy
-#                "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
-#                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
-#    endif ()
-#    foreach (QT_LIB Core Gui Widgets Network)
-#        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#                COMMAND ${CMAKE_COMMAND} -E copy
-#                "${QT_INSTALL_PATH}/bin/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
-#                "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
-#    endforeach (QT_LIB)
-#endif ()

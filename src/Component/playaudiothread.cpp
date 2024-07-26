@@ -6,7 +6,6 @@
 PlayAudioThread::PlayAudioThread(QObject* parent):
     QThread(parent),
     stopFlag(false),
-    quitFlag(false),
     audioCodecContext(nullptr),
     pFormatContext(nullptr),
     audioStreamIndex(-1)
@@ -20,15 +19,7 @@ PlayAudioThread::PlayAudioThread(QObject* parent):
 }
 
 PlayAudioThread::~PlayAudioThread() {
-    mutex.lock();
-    stopFlag = false;
-    quitFlag = true;
-    mutex.unlock();
-    condition.wakeAll();
-    if(audioPlayer){
-        audioPlayer->stop();
-        delete audioPlayer;
-    }
+    stop();
 }
 
 void PlayAudioThread::setQueues(DataQueue<AVFrame*>* audioQueue) {
@@ -64,8 +55,6 @@ void PlayAudioThread::run() {
             if (stopFlag) {
                 condition.wait(&mutex);
             }
-            if(quitFlag)
-                return;
         }
         if(audioStreamIndex == -1){
             QThread::usleep(10000);
@@ -76,7 +65,6 @@ void PlayAudioThread::run() {
         if(!playAudio())
             QThread::usleep(10000);
     }
-    exec();
 }
 
 void PlayAudioThread::init()
@@ -134,10 +122,9 @@ bool PlayAudioThread::playAudio() {
             }
             av_frame_free(&audioFrame);
             return true;
-        } else
-            return false;
-    }else
-            return false;
+        }
+    }
+    return false;
 
 }
 
@@ -151,14 +138,13 @@ void PlayAudioThread::resume() {
 }
 
 void PlayAudioThread::stop() {
-    QMutexLocker locker(&mutex);
-    stopFlag = false;
-    quitFlag = true;
+    requestInterruption();
+    resume();
+    audioQueue->stop();
     if(audioPlayer)
         audioPlayer->stop();
     delete audioPlayer;
     audioPlayer = nullptr;
-    condition.wakeAll();
 }
 
 int convertAudioFormat(AVFrame *frame, AVCodecContext *codecContext, uint8_t **outputBuffer) {

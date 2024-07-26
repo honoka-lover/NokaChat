@@ -11,13 +11,13 @@ INCLUDEPATH += $$PWD/include
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += $$files($$PWD/*.cpp) \
-    $$files($$PWD/Component/*.cpp,true) \
-    $$files($$PWD/Component/musicPlayer/*.cpp,true)
+SOURCES += $$files($$PWD/src/*.cpp) \
+    $$files($$PWD/src/Component/*.cpp,true) \
+    $$files($$PWD/src/Component/musicPlayer/*.cpp,true)
 
-HEADERS += $$files($$PWD/*.h) \
-    $$files($$PWD/Component/*.h,true)\
-    $$files($$PWD/Component/musicPlayer/*.h,true) \
+HEADERS += $$files($$PWD/src/*.h) \
+    $$files($$PWD/src/Component/*.h,true)\
+    $$files($$PWD/src/Component/musicPlayer/*.h,true) \
     $$files($$PWD/include/libavformat/*.h,true)\
     $$files($$PWD/include/libavcodec/*.h,true)\
     $$files($$PWD/include/libavutil/*.h,true)\
@@ -26,9 +26,9 @@ HEADERS += $$files($$PWD/*.h) \
     $$files($$PWD/include/libswresample/*.h,true)\
     $$files($$PWD/include/libavdevice/*.h,true)\
     $$files($$PWD/include/libpostproc/*.h,true)
-FORMS += $$files($$PWD/*.ui) \
-    $$files($$PWD/Component/*.ui,true)\
-    $$files($$PWD/Component/musicPlayer/*.ui,true)
+FORMS += $$files($$PWD/src/*.ui) \
+    $$files($$PWD/src/Component/*.ui,true)\
+    $$files($$PWD/src/Component/musicPlayer/*.ui,true)
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -39,6 +39,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    resource.qrc
+    source/resource.qrc
 
 LIBS += -L$$PWD/lib -lassimp-vc143-mt -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lpostproc -lswresample -lswscale

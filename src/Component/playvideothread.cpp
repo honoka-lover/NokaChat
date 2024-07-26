@@ -6,7 +6,6 @@ PlayVideoThread::PlayVideoThread(QObject* parent)
     : QThread(parent),
     stopFlag(false),
     audio(nullptr),
-    quitFlag(false),
     audioCodecContext(nullptr),
     pFormatContext(nullptr),
     videoStreamIndex(-1) {
@@ -19,11 +18,7 @@ PlayVideoThread::PlayVideoThread(QObject* parent)
 }
 
 PlayVideoThread::~PlayVideoThread() {
-    mutex.lock();
-    stopFlag = false;
-    quitFlag = true;
-    mutex.unlock();
-    condition.wakeAll();
+    stop();
 }
 
 void PlayVideoThread::setQueues(DataQueue<AVFrame*>* videoQueue) {
@@ -56,8 +51,6 @@ void PlayVideoThread::run() {
             if (stopFlag) {
                 condition.wait(&mutex);
             }
-            if(quitFlag)
-                return;
         }
         if(videoStreamIndex == -1){
             QThread::usleep(10000);
@@ -68,8 +61,6 @@ void PlayVideoThread::run() {
         if(!playVideo())
             QThread::usleep(10000);
     }
-    exec();
-
 }
 
 bool PlayVideoThread::playVideo() {
@@ -98,10 +89,9 @@ bool PlayVideoThread::playVideo() {
             emit frameDecoded(frameCopy);
             av_frame_free(&videoFrame);
             return true;
-        } else
-            return false;
-    }else
-        return false;
+        }
+    }
+    return false;
 }
 
 void PlayVideoThread::resume() {
@@ -113,8 +103,7 @@ void PlayVideoThread::resume() {
 }
 
 void PlayVideoThread::stop() {
-    QMutexLocker locker(&mutex);
-    stopFlag = false;
-    quitFlag = true;
-    condition.wakeAll();
+    videoQueue->stop();
+    requestInterruption();
+    resume();
 }

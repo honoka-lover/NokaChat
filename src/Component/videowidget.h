@@ -16,6 +16,7 @@ extern "C"{
 #include <QMutex>
 #include <QWaitCondition>
 #include <QOpenGLExtraFunctions>
+#include "Component/videotool.h"
 class VideoWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     Q_OBJECT
 signals:
@@ -24,7 +25,7 @@ public:
     VideoWidget(QWidget* parent = nullptr);
     ~VideoWidget();
 
-
+    void setAllTime(int64_t time);
 public slots:
     void setFrame(QSharedPointer<AVFrame> frame);
 
@@ -34,6 +35,9 @@ protected:
     void paintGL() override;
 
     void mouseDoubleClickEvent(QMouseEvent *event) override;
+
+    // void resizeEvent(QResizeEvent *event) override;
+    bool eventFilter(QObject* watched,QEvent*event) override;
 private:
     QOpenGLShaderProgram* program;
     QOpenGLTexture* textureY;
@@ -50,6 +54,8 @@ private:
     GLuint ebo;
 
     AVFormatContext *m_avFormatCxt;
+
+    VideoTool *m_VideoTool;
 
     int videoWidth;
     int videoHeight;

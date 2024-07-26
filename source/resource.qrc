@@ -1,0 +1,33 @@
+﻿<RCC>
+    <qresource prefix="/">
+        <file>myStyle.qss</file>
+        <file>png/1.jpg</file>
+        <file>png/back.png</file>
+        <file>png/last.png</file>
+        <file>png/next.png</file>
+        <file>png/pause.png</file>
+        <file>png/start.png</file>
+        <file>png/transparent.png</file>
+        <file>png/CIRCLE_FAST_FORWARD.png</file>
+        <file>png/CIRCLE_PAUSE.png</file>
+        <file>png/CIRCLE_PLAY.png</file>
+        <file>png/CIRCLE_REWIND.png</file>
+        <file>png/CIRCLE_SKIP_NEXT.png</file>
+        <file>png/CIRCLE_SKIP_PREVIOUS.png</file>
+        <file>png/CIRCLE_STOP.png</file>
+        <file>png/DOCUMENT_ADD.png</file>
+        <file>png/VOLUME.png</file>
+        <file>png/VOLUME_MUTE.png</file>
+        <file>png/trumpt.png</file>
+        <file>glsl/earth.fsh</file>
+        <file>glsl/earth.vsh</file>
+        <file>glsl/sky.fsh</file>
+        <file>glsl/sky.vsh</file>
+        <file>model/skybox/back.jpg</file>
+        <file>model/skybox/bottom.jpg</file>
+        <file>model/skybox/front.jpg</file>
+        <file>model/skybox/left.jpg</file>
+        <file>model/skybox/right.jpg</file>
+        <file>model/skybox/top.jpg</file>
+    </qresource>
+</RCC>

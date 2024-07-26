@@ -39,7 +39,6 @@ private:
     DataQueue<AVFrame*>* videoQueue;
 
     bool stopFlag;
-    bool quitFlag;
     AVCodecContext* audioCodecContext;
     AVFormatContext* pFormatContext;
 

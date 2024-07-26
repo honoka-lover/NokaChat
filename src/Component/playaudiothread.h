@@ -42,7 +42,6 @@ protected:
 private:
     DataQueue<AVFrame*>* audioQueue;
     bool stopFlag;
-    bool quitFlag;
     AVCodecContext* audioCodecContext;
     AVFormatContext* pFormatContext;
     int audioStreamIndex;

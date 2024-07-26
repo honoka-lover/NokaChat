@@ -4,13 +4,15 @@
 #include <QKeyEvent>
 #include <QEvent>
 #include <QMouseEvent>
+
 VideoWidget::VideoWidget(QWidget* parent):
     QOpenGLWidget(parent),
     program(nullptr),
     textureY(nullptr),
     textureU(nullptr),
     textureV(nullptr),
-    currentFrame(nullptr)
+    currentFrame(nullptr),
+    m_VideoTool(nullptr)
 {
     m_avFormatCxt = nullptr;
     videoWidth=0;
@@ -19,6 +21,8 @@ VideoWidget::VideoWidget(QWidget* parent):
     installEventFilter(this);
     //捕获键盘输入
     this->grabKeyboard();
+    this->setMouseTracking(true);
+    m_VideoTool = new VideoTool(this);
 }
 
 VideoWidget::~VideoWidget() {
@@ -28,6 +32,13 @@ VideoWidget::~VideoWidget() {
     if (textureV) delete textureV;
     if (currentFrame) av_frame_free(&currentFrame);
 
+}
+
+void VideoWidget::setAllTime(int64_t time)
+{
+    if(m_VideoTool){
+        m_VideoTool->setAllTime(time);
+    }
 }
 
 void VideoWidget::initializeGL() {
@@ -159,9 +170,14 @@ void VideoWidget::updateTextures() {
 
 void VideoWidget::resizeGL(int w, int h) {
     glViewport(0, 0, w, h);
-    if(videoHeight == 0&& videoHeight == 0)
+    if(m_VideoTool){
+        m_VideoTool->setGeometry(0,h-70,w,70);
+    }
+    if(videoHeight == 0&& videoHeight == 0){
+
         return;
-    updateVertices(w, h, videoWidth, videoHeight);
+    }
+    updateVertices(w, h, videoWidth, videoHeight);   
 }
 
 void VideoWidget::paintGL() {
@@ -184,20 +200,37 @@ void VideoWidget::mouseDoubleClickEvent(QMouseEvent *event)
     emit fullScreen();
 }
 
+bool VideoWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    if(watched == this && event->type() == QEvent::KeyPress){
+        QKeyEvent* e = (QKeyEvent*)event;
+        switch(e->key()){
+        case Qt::Key_Space:
+            qDebug()<<"暂停";
+            break;
+        }
+    }
+    return false;
+}
+
+// void VideoWidget::resizeEvent(QResizeEvent *event)
+// {
+//     if(m_VideoTool){
+//         m_VideoTool->setGeometry(0,this->height()-65,this->width(),60);
+//     }
+// }
+
 void VideoWidget::setFrame(QSharedPointer<AVFrame> frame) {
     QMutexLocker locker(&frameMutex);
     if (currentFrame) {
         av_frame_free(&currentFrame);
     }
     currentFrame = av_frame_clone(frame.data());
-    videoWidth = frame->width;
-    videoHeight = frame->height;
 
-    //首次接受数据时修改长度
-    static int i=0;
-    if(i==0){
-        updateVertices(width(),height(),videoWidth,videoHeight);
-        i++;
+    if(videoWidth != frame->width || videoHeight != frame->height) {
+        videoWidth = frame->width;
+        videoHeight = frame->height;
+        updateVertices(width(), height(), videoWidth, videoHeight);
     }
     update();
 }

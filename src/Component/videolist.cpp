@@ -22,7 +22,7 @@ VideoList::VideoList(QWidget* parent):
 
 
     // 创建 QSettings 对象，指定 INI 文件的路径
-    QSettings settings("../source/setting.ini", QSettings::IniFormat);
+    QSettings settings("../../source/setting.ini", QSettings::IniFormat);
 
     // 读取 General 组中的键值
     QString path = settings.value("Video/ListPath").toString();

@@ -64,15 +64,15 @@ private:
 
     VideoWidget* videoWidget;
     QMutex mutex;
-    QWaitCondition condition;
-    bool stopFlag;
-    bool quitFlag;
     int videoStreamIndex;
     int audioStreamIndex;
 
     PlayAudioThread *audioThread;
     PlayVideoThread *videoThread;
 
+    std::atomic<bool> stopped;
+    std::atomic<bool> seekRequested;
+    int64_t seekTime;
     void initDecode();
 };
 
