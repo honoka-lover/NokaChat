@@ -41,12 +41,7 @@ MainWidget::MainWidget(QWidget *parent)
 }
 
 MainWidget::~MainWidget()
-{
-    if(decode){
-        decode->stop();
-        decode->wait();
-        delete decode;
-    }
+{ 
     if(videoThread) {
         videoThread->stop();
         videoThread->wait();
@@ -56,6 +51,11 @@ MainWidget::~MainWidget()
         audioThread->stop();
         audioThread->wait();
         delete audioThread;
+    }
+    if(decode){
+        decode->stop();
+        decode->wait();
+        delete decode;
     }
     if(videoPlayer){
         delete videoPlayer;
@@ -225,6 +225,7 @@ void MainWidget::playFile(QString file)
     decode->bindPlayThread(audioThread,videoThread);
     connect(videoThread,&PlayVideoThread::frameDecoded,videoPlayer,&VideoWidget::setFrame);
     connect(videoPlayer,&VideoWidget::sendVolumn,audioThread,&PlayAudioThread::setVolumn);
+    connect(videoPlayer,&VideoWidget::updateTime,decode,&DecodeThread::seek);
     decode->start();
     audioThread->start();
     videoThread->start();

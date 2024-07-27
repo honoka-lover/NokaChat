@@ -29,6 +29,7 @@ VideoWidget::VideoWidget(QWidget* parent):
         emit pauseScreen(ok);
     });
     connect(m_VideoTool,&VideoTool::sigVolumn,this,&VideoWidget::sendVolumn);
+    connect(m_VideoTool, &VideoTool::updateTimeStamp, this, &VideoWidget::updateTime);
 }
 
 VideoWidget::~VideoWidget() {
@@ -45,7 +46,6 @@ void VideoWidget::setAllTime(int64_t time)
     if(m_VideoTool){
         m_VideoTool->show();
         m_VideoTool->setAllTime(time);
-        m_VideoTool->setPauseButtonState(false);
         isPlay = true;
     }
 }
@@ -224,14 +224,18 @@ bool VideoWidget::eventFilter(QObject *watched, QEvent *event)
         switch(e->key()){
         case Qt::Key_Space:
             if(m_VideoTool){
-                m_VideoTool->setPauseButtonState(isPlay);
-                emit pauseScreen(isPlay);
-                isPlay = !isPlay;
+                m_VideoTool->setPauseButtonToggle();
             }
             break;
         case Qt::Key_Escape:
             if(isFullScreen())
                 emit mouseDoubleClickEvent(NULL);
+            break;
+        case Qt::Key_Left:
+            m_VideoTool->reduceTime();
+            break;
+        case Qt::Key_Right:
+            m_VideoTool->addTime();
             break;
         }
     }else if(watched == this && event->type() == QEvent::MouseMove){

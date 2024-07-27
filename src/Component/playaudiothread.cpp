@@ -5,7 +5,7 @@
 #include <QMediaDevices>
 PlayAudioThread::PlayAudioThread(QObject* parent):
     QThread(parent),
-    stopFlag(false),
+    stopped(false),
     audioCodecContext(nullptr),
     pFormatContext(nullptr),
     audioStreamIndex(-1)
@@ -42,7 +42,7 @@ int64_t PlayAudioThread::getAudioPts()
 void PlayAudioThread::pause()
 {
     mutex.lock();
-    stopFlag = true;
+    stopped = true;
     stopTime = av_gettime();
     mutex.unlock();
 //    audioPlayer->stop();
@@ -50,11 +50,9 @@ void PlayAudioThread::pause()
 
 void PlayAudioThread::run() {
     while (!isInterruptionRequested()) {
-        {
-            QMutexLocker locker(&mutex);
-            if (stopFlag) {
-                condition.wait(&mutex);
-            }
+        if (stopped) {
+            QThread::msleep(10);
+            continue;
         }
         if(audioStreamIndex == -1){
             QThread::usleep(10000);
@@ -136,7 +134,7 @@ void PlayAudioThread::setVolumn(int value)
 
 void PlayAudioThread::resume() {
     QMutexLocker locker(&mutex);
-    stopFlag = false;
+    stopped = false;
     resumeTime = av_gettime();
     startTime = startTime + resumeTime -stopTime;
 //    audioPlayer->resume();
@@ -151,6 +149,14 @@ void PlayAudioThread::stop() {
         audioPlayer->stop();
     delete audioPlayer;
     audioPlayer = nullptr;
+}
+
+void PlayAudioThread::updateTimeStamp(int64_t stamp)
+{
+    mutex.lock();
+    startTime = av_gettime() - stamp;
+    audioPlayer->clearData();
+    mutex.unlock();
 }
 
 int convertAudioFormat(AVFrame *frame, AVCodecContext *codecContext, uint8_t **outputBuffer) {

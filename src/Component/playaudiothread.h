@@ -34,6 +34,8 @@ public:
     void resume();
 
     void stop();
+
+    void updateTimeStamp(int64_t stamp);
 public slots:
     bool playAudio();
     void setVolumn(int value);
@@ -42,7 +44,7 @@ protected:
 
 private:
     DataQueue<AVFrame*>* audioQueue;
-    bool stopFlag;
+    std::atomic<bool> stopped;
     AVCodecContext* audioCodecContext;
     AVFormatContext* pFormatContext;
     int audioStreamIndex;

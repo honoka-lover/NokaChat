@@ -24,6 +24,7 @@ signals:
     void exitFullScreen();
     void pauseScreen(bool);
     void sendVolumn(int);
+    void updateTime(int64_t);
 public:
     VideoWidget(QWidget* parent = nullptr);
     ~VideoWidget();

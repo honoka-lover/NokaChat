@@ -26,6 +26,19 @@ void AudioPlayer::stop()
         audioSink->stop();
 }
 
+void AudioPlayer::clearData()
+{
+    if(audioIODevice){
+        m_mutex.lock();
+
+        audioSink->stop();
+        audioIODevice->close();
+        audioIODevice = audioSink->start();
+        audioIODevice->open(QIODevice::ReadWrite);
+        m_mutex.unlock();
+    }
+}
+
 void AudioPlayer::setVolumn(int value)
 {
     if(audioSink)
@@ -34,10 +47,12 @@ void AudioPlayer::setVolumn(int value)
 
 void AudioPlayer::audioWrite(const char *data, int len)
 {
+    m_mutex.lock();
     if(audioIODevice)
         audioIODevice->write(data,len);
     else
         qDebug()<<"播放设备为初始化";
+    m_mutex.unlock();
 }
 
 void AudioPlayer::resume() {

@@ -21,12 +21,15 @@ class DataQueue {
 public:
     DataQueue(size_t maxSize = 100) : maxSize(maxSize),stopped(false) {}
 
-    void push(T item) {
+    bool  push(T item) {
         std::unique_lock<std::mutex> lock(mutex);
         cond.wait(lock, [this]() { return queue.size() < maxSize || stopped; });
-        if (stopped) return;
+        // if (stopped) return false;
+        if(queue.size() >= maxSize)
+            return false;
         queue.push(item);
         cond.notify_all();
+        return true;
     }
 
     bool pop(T& item) {
@@ -47,6 +50,12 @@ public:
     void stop() {
         std::unique_lock<std::mutex> lock(mutex);
         stopped = true;
+        cond.notify_all();
+    }
+
+    void resume(){
+        std::unique_lock<std::mutex> lock(mutex);
+        stopped = false;
         cond.notify_all();
     }
 private:

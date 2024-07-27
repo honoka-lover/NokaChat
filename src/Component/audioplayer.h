@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QAudioSink>
 #include <QIODevice>
+#include <QMutex>
 #include "Component/dataqueue.h"
 extern "C" {
 #include <libavformat/avformat.h>
@@ -25,12 +26,14 @@ public:
     void resume();
     void stop();
 
+    void clearData();
     void setVolumn(int);
 public slots:
     void audioWrite(const char* data,int len);
 private:
     QAudioSink* audioSink;
     QIODevice* audioIODevice;
+    QMutex m_mutex;
 };
 
 #endif // AUDIOPLAYER_H

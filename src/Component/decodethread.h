@@ -42,13 +42,15 @@ public:
 
     void bindPlayThread(PlayAudioThread *audio,PlayVideoThread *video);
 
-    void seek(int64_t timestamp);
-
     AVCodecContext* getAudioCodecContext();
 
     void pause();
     void resume();
     void stop();
+
+public slots:
+    void seek(int64_t timestamp);
+
 protected:
     void run() override;
 
@@ -72,6 +74,7 @@ private:
 
     std::atomic<bool> stopped;
     std::atomic<bool> seekRequested;
+    bool playStateChanged = false;
     int64_t seekTime;
     void initDecode();
 };

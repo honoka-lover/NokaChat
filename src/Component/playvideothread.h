@@ -23,6 +23,8 @@ public:
     void stop();
     void resume();
     void pause();
+
+    void updateTimeStamp(int64_t stamp);
 public slots:
     bool playVideo();
 signals:
@@ -37,8 +39,7 @@ private:
 
 
     DataQueue<AVFrame*>* videoQueue;
-
-    bool stopFlag;
+    std::atomic<bool> stopped;
     AVCodecContext* audioCodecContext;
     AVFormatContext* pFormatContext;
 

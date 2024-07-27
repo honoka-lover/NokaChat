@@ -16,6 +16,9 @@
 #include <QFileInfo>
 #include <QStyledItemDelegate>
 #include <QFontMetrics>
+#include <QHBoxLayout>
+#include <QLabel>
+
 class VideoList : public QWidget
 {
     Q_OBJECT
@@ -34,13 +37,20 @@ protected:
 
 private slots:
     void playVideo(const QModelIndex& index);
+    void selectDir();
 private:
     QTreeView* m_view;
     QStandardItemModel m_model;
     QString m_path;
 
-    void flushTree();
+    void clearTree();
     QVBoxLayout *layout;
+    QHBoxLayout *layout1;
+    QWidget *innerWidget;
+    QLabel *pathLabel;
+    QToolButton *openButton;
+    //筛选出的文件后缀
+    QStringList extensions;
 };
 
 #endif // VIDEOLIST_H

@@ -4,7 +4,7 @@
 #include <QDebug>
 PlayVideoThread::PlayVideoThread(QObject* parent)
     : QThread(parent),
-    stopFlag(false),
+    stopped(false),
     audio(nullptr),
     audioCodecContext(nullptr),
     pFormatContext(nullptr),
@@ -39,18 +39,23 @@ void PlayVideoThread::bindAudio(PlayAudioThread *au)
 void PlayVideoThread::pause()
 {
     mutex.lock();
-    stopFlag = true;
+    stopped = true;
     stopTime = av_gettime();
+    mutex.unlock();
+}
+
+void PlayVideoThread::updateTimeStamp(int64_t stamp)
+{
+    mutex.lock();
+    startTime = av_gettime() - stamp;
     mutex.unlock();
 }
 
 void PlayVideoThread::run() {
     while (!isInterruptionRequested()) {
-        {
-            QMutexLocker locker(&mutex);
-            if (stopFlag) {
-                condition.wait(&mutex);
-            }
+        if (stopped) {
+            QThread::msleep(10);
+            continue;
         }
         if(videoStreamIndex == -1){
             QThread::usleep(10000);
@@ -96,7 +101,7 @@ bool PlayVideoThread::playVideo() {
 
 void PlayVideoThread::resume() {
     QMutexLocker locker(&mutex);
-    stopFlag = false;
+    stopped = false;
     resumeTime = av_gettime();
     startTime = startTime + resumeTime - stopTime;
     condition.wakeAll();
