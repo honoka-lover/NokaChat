@@ -31,9 +31,13 @@ MainWidget::MainWidget(QWidget *parent)
 
 
     connect(videoList,&VideoList::sigFileName,this,&MainWidget::playFile);
+    connect(videoPlayer,&VideoWidget::pauseScreen,this,&MainWidget::pauseVideo);
+    connect(videoPlayer,&VideoWidget::exitFullScreen,this,&MainWidget::exitFullScreen);
+
     ui->frame_2->installEventFilter(this);
     setMouseTracking(true);
     this->installEventFilter(this);
+    videoPlayer->grabKeyboard();
 }
 
 MainWidget::~MainWidget()
@@ -149,32 +153,32 @@ bool MainWidget::eventFilter(QObject *watched, QEvent *event) {
             openGLWidget->grabKeyboard();
         else if(videoPlayer && videoPlayer->isVisible())
             videoPlayer->grabKeyboard();
-        QKeyEvent *e = (QKeyEvent*)event;
-        switch(e->key()){
-        case Qt::Key_Space:
-//            qDebug()<<"暂停";
-            if(!isPlay){
-                isPlay = true;
-                if(decode)
-                    decode->resume();
-                if(audioThread)
-                    audioThread->resume();
-                if(videoThread)
-                    videoThread->resume();
-            }else {
-                isPlay = false;
-                if (decode)
-                    decode->pause();
-                if (audioThread)
-                    audioThread->pause();
-                if (videoThread)
-                    videoThread->pause();
-            }
-            break;
-        case Qt::Key_Escape:
-            qDebug()<<"退出全屏";
-            break;
-        }
+//         QKeyEvent *e = (QKeyEvent*)event;
+//         switch(e->key()){
+//         case Qt::Key_Space:
+// //            qDebug()<<"暂停";
+//             if(!isPlay){
+//                 isPlay = true;
+//                 if(decode)
+//                     decode->resume();
+//                 if(audioThread)
+//                     audioThread->resume();
+//                 if(videoThread)
+//                     videoThread->resume();
+//             }else {
+//                 isPlay = false;
+//                 if (decode)
+//                     decode->pause();
+//                 if (audioThread)
+//                     audioThread->pause();
+//                 if (videoThread)
+//                     videoThread->pause();
+//             }
+//             break;
+//         case Qt::Key_Escape:
+//             qDebug()<<"退出全屏";
+//             break;
+//         }
     }
 
 
@@ -210,7 +214,6 @@ void MainWidget::playFile(QString file)
         delete videoThread;
         delete audioThread;
     }
-    isPlay = true;
     decode = new DecodeThread(this);
     decode->bindVideoWidget(videoPlayer);
     decode->setFileName(file);
@@ -221,9 +224,35 @@ void MainWidget::playFile(QString file)
     videoThread = new PlayVideoThread(this);
     decode->bindPlayThread(audioThread,videoThread);
     connect(videoThread,&PlayVideoThread::frameDecoded,videoPlayer,&VideoWidget::setFrame);
+    connect(videoPlayer,&VideoWidget::sendVolumn,audioThread,&PlayAudioThread::setVolumn);
     decode->start();
     audioThread->start();
     videoThread->start();
+}
+
+void MainWidget::pauseVideo(bool ok)
+{
+    if(!ok){
+        if(decode)
+            decode->resume();
+        if(audioThread)
+            audioThread->resume();
+        if(videoThread)
+            videoThread->resume();
+    }else {
+        if (decode)
+            decode->pause();
+        if (audioThread)
+            audioThread->pause();
+        if (videoThread)
+            videoThread->pause();
+    }
+
+}
+
+void MainWidget::exitFullScreen()
+{
+    LeftLayout.addWidget(videoPlayer);
 }
 
 

@@ -1,7 +1,6 @@
 ﻿<RCC>
     <qresource prefix="/">
         <file>myStyle.qss</file>
-        <file>png/1.jpg</file>
         <file>png/back.png</file>
         <file>png/last.png</file>
         <file>png/next.png</file>
@@ -29,5 +28,7 @@
         <file>model/skybox/left.jpg</file>
         <file>model/skybox/right.jpg</file>
         <file>model/skybox/top.jpg</file>
+        <file>png/icon.png</file>
+        <file>icon.ico</file>
     </qresource>
 </RCC>

@@ -24,6 +24,8 @@ public:
 
     void resume();
     void stop();
+
+    void setVolumn(int);
 public slots:
     void audioWrite(const char* data,int len);
 private:

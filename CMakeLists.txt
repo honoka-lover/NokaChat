@@ -12,7 +12,6 @@ set(CMAKE_AUTOUIC ON)
 #set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
 set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
 
-
 find_package(Qt6 COMPONENTS
         Core
         Gui
@@ -70,6 +69,7 @@ add_executable(Vanilla
         ${FILTERED_SRC_FILES}
         ${FILTERED_HEAD_FILES}
         source/resource.qrc
+        source/myicon.rc
 )
 target_link_libraries(Vanilla
         PRIVATE
@@ -80,4 +80,5 @@ target_link_libraries(Vanilla
         Qt::Multimedia
         Qt::OpenGLWidgets
 )
+
 

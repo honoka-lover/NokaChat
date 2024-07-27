@@ -26,6 +26,12 @@ void AudioPlayer::stop()
         audioSink->stop();
 }
 
+void AudioPlayer::setVolumn(int value)
+{
+    if(audioSink)
+        audioSink->setVolume(value / 100.0f);
+}
+
 void AudioPlayer::audioWrite(const char *data, int len)
 {
     if(audioIODevice)

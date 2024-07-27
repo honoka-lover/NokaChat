@@ -36,6 +36,7 @@ public:
     void stop();
 public slots:
     bool playAudio();
+    void setVolumn(int value);
 protected:
     void run() override;
 

@@ -23,6 +23,12 @@ VideoWidget::VideoWidget(QWidget* parent):
     this->grabKeyboard();
     this->setMouseTracking(true);
     m_VideoTool = new VideoTool(this);
+    m_VideoTool->hide();
+    connect(m_VideoTool,&VideoTool::sigPuase,this,[=](bool ok){
+        isPlay = ok;
+        emit pauseScreen(ok);
+    });
+    connect(m_VideoTool,&VideoTool::sigVolumn,this,&VideoWidget::sendVolumn);
 }
 
 VideoWidget::~VideoWidget() {
@@ -37,7 +43,10 @@ VideoWidget::~VideoWidget() {
 void VideoWidget::setAllTime(int64_t time)
 {
     if(m_VideoTool){
+        m_VideoTool->show();
         m_VideoTool->setAllTime(time);
+        m_VideoTool->setPauseButtonState(false);
+        isPlay = true;
     }
 }
 
@@ -196,8 +205,16 @@ void VideoWidget::paintGL() {
 
 void VideoWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    qDebug()<<"全屏";
-    emit fullScreen();
+    if(isFullScreen()){
+        // showNormal();
+        this->setWindowFlags(windowFlag);
+        emit exitFullScreen();
+    }else{
+        windowFlag = this->windowFlags();
+        this->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
+        showFullScreen();
+        emit fullScreen();
+    }
 }
 
 bool VideoWidget::eventFilter(QObject *watched, QEvent *event)
@@ -206,8 +223,23 @@ bool VideoWidget::eventFilter(QObject *watched, QEvent *event)
         QKeyEvent* e = (QKeyEvent*)event;
         switch(e->key()){
         case Qt::Key_Space:
-            qDebug()<<"暂停";
+            if(m_VideoTool){
+                m_VideoTool->setPauseButtonState(isPlay);
+                emit pauseScreen(isPlay);
+                isPlay = !isPlay;
+            }
             break;
+        case Qt::Key_Escape:
+            if(isFullScreen())
+                emit mouseDoubleClickEvent(NULL);
+            break;
+        }
+    }else if(watched == this && event->type() == QEvent::MouseMove){
+        QMouseEvent *e =(QMouseEvent*)event;
+        if(e->pos().y() > height() - m_VideoTool->height() -20 && currentFrame){
+            m_VideoTool->show();
+        }else{
+            m_VideoTool->hide();
         }
     }
     return false;

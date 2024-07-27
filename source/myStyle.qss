@@ -1,5 +1,6 @@
 QFrame {
     border-style: flat;
+    background:transparent;
 }
 
 QFrame#mainUI {
@@ -15,7 +16,7 @@ QFrame#mainUI2 {
 }
 
 QFrame#videoToolBack{
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.5);
     border-style: flat;
 }
 
@@ -58,6 +59,11 @@ QToolButton#lastButton{
 
 QToolButton#nextButton{
     border-image: url(:png/CIRCLE_FAST_FORWARD.png);
+}
+
+QToolButton#blankButton{
+    border:none;
+    background:transparent;
 }
 
 QPushButton#slider{
@@ -130,10 +136,10 @@ QSlider#myAudio
     padding-bottom: 15px;
     border-radius: 5px; /*外边框矩形倒角*/
 }
-  
+
 QSlider::add-page:vertical#myAudio
 {
-    background-color: #344081;
+    background-color: rgba(255, 255, 255, 0.5);
     width:5px;
     border-radius: 2px;
 }
@@ -169,7 +175,7 @@ QSlider::groove:horizontal#musicSlider {
 /*1.滑动过的槽设计参数*/
 QSlider::sub-page:horizontal#musicSlider {
     /*槽颜色*/
-    background: rgba(151, 48, 16, 0.432);
+    background: rgba(200, 200, 200, 0.432);
     /*外环区域倒圆角度*/
     border-radius: 2px;
     /*上遮住区域高度*/

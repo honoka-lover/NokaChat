@@ -49,7 +49,6 @@ private:
 
     VideoList *videoList;
 
-    bool isPlay = false;
     void setComponentVisible();
 
     void init();
@@ -63,6 +62,9 @@ protected:
 private slots:
     void playFile(QString file);
 
+    void pauseVideo(bool ok);
+
+    void exitFullScreen();
 };
 
 #endif // MAINWIDGET_H

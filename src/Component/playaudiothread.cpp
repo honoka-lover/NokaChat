@@ -128,6 +128,12 @@ bool PlayAudioThread::playAudio() {
 
 }
 
+void PlayAudioThread::setVolumn(int value)
+{
+    if(audioPlayer)
+        audioPlayer->setVolumn(value);
+}
+
 void PlayAudioThread::resume() {
     QMutexLocker locker(&mutex);
     stopFlag = false;

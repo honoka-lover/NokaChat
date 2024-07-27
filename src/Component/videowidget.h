@@ -21,6 +21,9 @@ class VideoWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     Q_OBJECT
 signals:
     void fullScreen();
+    void exitFullScreen();
+    void pauseScreen(bool);
+    void sendVolumn(int);
 public:
     VideoWidget(QWidget* parent = nullptr);
     ~VideoWidget();
@@ -56,6 +59,10 @@ private:
     AVFormatContext *m_avFormatCxt;
 
     VideoTool *m_VideoTool;
+
+    bool isPlay = false;
+
+    Qt::WindowFlags windowFlag;
 
     int videoWidth;
     int videoHeight;
