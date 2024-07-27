@@ -38,6 +38,7 @@ MainWidget::MainWidget(QWidget *parent)
     setMouseTracking(true);
     this->installEventFilter(this);
     videoPlayer->grabKeyboard();
+    this->setWindowTitle("Vanilla");
 }
 
 MainWidget::~MainWidget()

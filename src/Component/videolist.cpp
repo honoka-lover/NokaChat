@@ -7,12 +7,12 @@
 VideoList::VideoList(QWidget* parent):
     QWidget(parent)
 {
-    m_view = new QTreeView(this);
-    layout = new QVBoxLayout(this);
-    layout1 = new QHBoxLayout(this);
-    pathLabel = new QLabel(this);
-    openButton = new QToolButton(this);
-    innerWidget = new QWidget(this);
+    m_view = new QTreeView;
+    layout = new QVBoxLayout;
+    layout1 = new QHBoxLayout;
+    pathLabel = new QLabel;
+    openButton = new QToolButton;
+    innerWidget = new QWidget;
     layout1->addWidget(pathLabel);
     layout1->addWidget(openButton);
     innerWidget->setLayout(layout1);
@@ -32,7 +32,7 @@ VideoList::VideoList(QWidget* parent):
 
 
     // 创建 QSettings 对象，指定 INI 文件的路径
-    QSettings settings("../../source/setting.ini", QSettings::IniFormat);
+    QSettings settings("setting.ini", QSettings::IniFormat);
 
     // 读取 General 组中的键值
     QString path = settings.value("Video/ListPath").toString();

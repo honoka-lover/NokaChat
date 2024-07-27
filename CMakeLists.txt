@@ -63,8 +63,7 @@ message(STATUS "Filtered source files: ${FILTERED_SRC_FILES}")
 
 include_directories(src include)
 file(GLOB LibFile "lib/*.lib")
-link_libraries(${LibFile})
-
+file(GLOB DllFile "lib/*.dll")
 add_executable(Vanilla
         ${FILTERED_SRC_FILES}
         ${FILTERED_HEAD_FILES}
@@ -79,6 +78,19 @@ target_link_libraries(Vanilla
         Qt::Network
         Qt::Multimedia
         Qt::OpenGLWidgets
+        ${LibFile}
 )
+#复制dll和配置文件到执行目录
+configure_file(source/setting.ini ${CMAKE_CURRENT_BINARY_DIR}/setting.ini COPYONLY)
+file(COPY ${DllFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+# 安装文件
+install(TARGETS Vanilla DESTINATION bin)
+install(FILES ${LibFile} ${DllFile} DESTINATION bin)
+#install(FILES ${FILTERED_HEAD_FILES} DESTINATION include)
+# 打包
+set(CPACK_PACKAGE_NAME "Vanilla")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_GENERATOR "ZIP")
+include(CPack)
 
