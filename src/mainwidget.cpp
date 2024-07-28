@@ -11,7 +11,6 @@ MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget)
     , leftUI(nullptr)
-    , mainFrom(nullptr)
     , mymusicplayer(nullptr)
     , openGLWidget(nullptr)
     , decode(nullptr)
@@ -28,14 +27,14 @@ MainWidget::MainWidget(QWidget *parent)
     file.close();
 
     setComponentVisible();
-
+    setTypeList(0);
 
     connect(videoList,&VideoList::sigFileName,this,&MainWidget::playFile);
     connect(videoPlayer,&VideoWidget::pauseScreen,this,&MainWidget::pauseVideo);
     connect(videoPlayer,&VideoWidget::exitFullScreen,this,&MainWidget::exitFullScreen);
+    connect(leftUI, &LeftSideBarButton::selectStyle,this,&MainWidget::setTypeList);
 
     ui->frame_2->installEventFilter(this);
-    setMouseTracking(true);
     this->installEventFilter(this);
     videoPlayer->grabKeyboard();
     this->setWindowTitle("Vanilla");
@@ -66,71 +65,81 @@ MainWidget::~MainWidget()
 
 void MainWidget::setComponentVisible()
 {
-    leftUI->hide();
+    // leftUI->hide();
 
     downlaodTool->hide();
 
     mymusicplayer->hide();
-    // videoPlayer->hide();
+    videoPlayer->hide();
     if(openGLWidget)
         openGLWidget->hide();
 
-//    videoList->hide();
+   // videoList->hide();
 }
 
 void MainWidget::init()
 {
-    ui->frame->setMinimumWidth(400);
+    ui->frame->setMinimumWidth(200);
     ui->frame_2->setMinimumWidth(200);
 
+    leftLayout = new QVBoxLayout;
+    rightLayout = new QVBoxLayout;
+    middleLayout = new QVBoxLayout;
+    mainMenuSplitter = new QSplitter;
+    mainMenuSplitter->setContentsMargins(0,0,0,0);
+    //设置水平拆分布局
+    mainMenuSplitter->setOrientation(Qt::Horizontal);
+    // 设置为不透明分隔器
+    mainMenuSplitter->setOpaqueResize(true);
+    mainMenuSplitter->setHandleWidth(5);
+    leftLayout->addWidget(mainMenuSplitter);
+
+    innerWidget = new QWidget;
+
+    leftLayout->setSpacing(0);
+    leftLayout->setContentsMargins(0,0,0,0);
+    middleLayout->setSpacing(0);
+    middleLayout->setContentsMargins(0,0,0,0);
+    rightLayout->setSpacing(0);
+    rightLayout->setContentsMargins(0,0,0,0);
+
     leftUI = new LeftSideBarButton();
-    LeftLayout.addWidget(leftUI);
-    LeftLayout.setSpacing(0);
-    LeftLayout.setContentsMargins(0,0,0,0);
-    RightLayout.setSpacing(0);
-    RightLayout.setContentsMargins(0,0,0,0);
+    mainMenuSplitter->addWidget(leftUI);
+    mainMenuSplitter->addWidget(innerWidget);
+    mainMenuSplitter->setSizes(QList<int>()<<200<<600<<600);
 
-    downlaodTool = new downloadSoft(this);
-    RightLayout.addWidget(downlaodTool);
-
-    mymusicplayer = new MyMusicPlayer(this);
-    RightLayout.addWidget(mymusicplayer);
-
+    //左边frame窗口
     QSurfaceFormat format;
     //设置每个每个像素采样样本个数，用于抗锯齿
     format.setSamples(16);
     videoPlayer = new VideoWidget(this);
     videoPlayer->setFormat(format);
     videoPlayer->show();
+    middleLayout->addWidget(videoPlayer);
 
-    LeftLayout.addWidget(videoPlayer);
-
-
+    //左边frame窗口
     openGLWidget = new OpenGLWidget(this);
     openGLWidget->setFormat(format);
     openGLWidget->StartAnimating();
+    middleLayout->addWidget(openGLWidget);
 
+    //右边frame窗口
+    downlaodTool = new downloadSoft(this);
+    rightLayout->addWidget(downlaodTool);
+
+    //右边frame窗口
+    mymusicplayer = new MyMusicPlayer(this);
+    rightLayout->addWidget(mymusicplayer);
+
+    //右边frame窗口
     videoList = new VideoList(this);
-    RightLayout.addWidget(videoList);
+    rightLayout->addWidget(videoList);
 
-    LeftLayout.addWidget(openGLWidget);
 
-    ui->frame->setLayout(&LeftLayout);
-    ui->frame_2->setLayout(&RightLayout);
 
-//    //设置右边背景图片
-//    ui->frame_2->setObjectName("mainUI");
-//
-//    //设置背景图片
-//    ui->frame->setObjectName("mainUI2");
-
-    // ui->pushButton->setObjectName("slider");
-
-//    if(mainFrom == nullptr){
-//        mainFrom = new MainFrom(ui->frame_2);
-//        mainFrom->hide();
-//    }
-
+    innerWidget->setLayout(middleLayout);
+    ui->frame->setLayout(leftLayout);
+    ui->frame_2->setLayout(rightLayout);
 }
 
 bool MainWidget::eventFilter(QObject *watched, QEvent *event) {
@@ -154,32 +163,6 @@ bool MainWidget::eventFilter(QObject *watched, QEvent *event) {
             openGLWidget->grabKeyboard();
         else if(videoPlayer && videoPlayer->isVisible())
             videoPlayer->grabKeyboard();
-//         QKeyEvent *e = (QKeyEvent*)event;
-//         switch(e->key()){
-//         case Qt::Key_Space:
-// //            qDebug()<<"暂停";
-//             if(!isPlay){
-//                 isPlay = true;
-//                 if(decode)
-//                     decode->resume();
-//                 if(audioThread)
-//                     audioThread->resume();
-//                 if(videoThread)
-//                     videoThread->resume();
-//             }else {
-//                 isPlay = false;
-//                 if (decode)
-//                     decode->pause();
-//                 if (audioThread)
-//                     audioThread->pause();
-//                 if (videoThread)
-//                     videoThread->pause();
-//             }
-//             break;
-//         case Qt::Key_Escape:
-//             qDebug()<<"退出全屏";
-//             break;
-//         }
     }
 
 
@@ -218,8 +201,6 @@ void MainWidget::playFile(QString file)
     decode = new DecodeThread(this);
     decode->bindVideoWidget(videoPlayer);
     decode->setFileName(file);
-    // decode->setFileName("../NokaChat/日南結里,Yunomi - 白猫海賊船.mp3");
-    // decode->setFileName("E:/NokaChat/source/test.wav");
 
     audioThread = new PlayAudioThread(this);
     videoThread = new PlayVideoThread(this);
@@ -230,6 +211,25 @@ void MainWidget::playFile(QString file)
     decode->start();
     audioThread->start();
     videoThread->start();
+}
+
+void MainWidget::stopPlayVideo()
+{
+    if(decode){
+        decode->stop();
+        decode->wait();
+        videoThread->stop();
+        videoThread->wait();
+        audioThread->stop();
+        audioThread->wait();
+        delete decode;
+        delete videoThread;
+        delete audioThread;
+        decode = nullptr;
+        videoThread = nullptr;
+        audioThread = nullptr;
+    }
+    videoPlayer->clearPage();
 }
 
 void MainWidget::pauseVideo(bool ok)
@@ -254,7 +254,30 @@ void MainWidget::pauseVideo(bool ok)
 
 void MainWidget::exitFullScreen()
 {
-    LeftLayout.addWidget(videoPlayer);
+    middleLayout->addWidget(videoPlayer);
+}
+
+void MainWidget::setTypeList(int style)
+{
+    if(style == 0){
+        videoPlayer->show();
+        ui->frame_2->show();
+        videoList->show();
+
+        openGLWidget->hide();
+        downlaodTool->hide();
+        mymusicplayer->hide();
+
+
+    }else if(style == 1){
+        stopPlayVideo();
+        videoPlayer->hide();
+        ui->frame_2->hide();
+
+        openGLWidget->show();
+        downlaodTool->hide();
+        mymusicplayer->hide();
+    }
 }
 
 

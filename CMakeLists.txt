@@ -83,10 +83,14 @@ target_link_libraries(Vanilla
 #复制dll和配置文件到执行目录
 configure_file(source/setting.ini ${CMAKE_CURRENT_BINARY_DIR}/setting.ini COPYONLY)
 file(COPY ${DllFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
+file(GLOB SourceFile "source/model")
+file(COPY ${SourceFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/source)
 # 安装文件
-install(TARGETS Vanilla DESTINATION bin)
-install(FILES ${LibFile} ${DllFile} DESTINATION bin)
+install(TARGETS Vanilla DESTINATION .)
+install(FILES ${LibFile} ${DllFile} DESTINATION .)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setting.ini DESTINATION .)
+set(SOURCE_DIR  "source/model")
+install(DIRECTORY  ${SOURCE_DIR} DESTINATION source)
 #install(FILES ${FILTERED_HEAD_FILES} DESTINATION include)
 # 打包
 set(CPACK_PACKAGE_NAME "Vanilla")

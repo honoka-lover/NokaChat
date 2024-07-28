@@ -123,7 +123,7 @@
           <widget class="QListWidget" name="listWidget">
            <item>
             <property name="text">
-             <string>Proxies</string>
+             <string>VideoPlay</string>
             </property>
             <property name="font">
              <font>
@@ -136,7 +136,7 @@
            </item>
            <item>
             <property name="text">
-             <string>Profiles</string>
+             <string>ModelShow</string>
             </property>
             <property name="font">
              <font>
@@ -149,7 +149,7 @@
            </item>
            <item>
             <property name="text">
-             <string>Conniections</string>
+             <string>MusicPlay</string>
             </property>
             <property name="font">
              <font>

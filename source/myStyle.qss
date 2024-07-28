@@ -26,7 +26,10 @@ QFrame#videoToolBack{
     border-style: flat;
 }
 
-
+QListWidget#listWidget:focus
+{
+    outline: 0px;
+}
 
 QListWidget#listWidget::item {
     color: white;
@@ -37,8 +40,6 @@ QListWidget#listWidget::item {
 QListWidget#listWidget::item:selected {
     color: white;
     background-color: rgba(234, 140, 103, 0.5);
-    border: none;
-    border-style: flat;
 }
 
 QToolButton#musicPlay {

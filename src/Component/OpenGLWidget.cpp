@@ -116,10 +116,10 @@ void OpenGLWidget::initializeGL()
 
     //加载顶点着色器程序
     // m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vCode.data());
-    m_program.addCacheableShaderFromSourceFile(QOpenGLShader::Vertex,":/glsl/earth.vsh");
+    m_program.addCacheableShaderFromSourceFile(QOpenGLShader::Vertex,":/glsl/earth.vert");
     //加载片段着色器程序
     // m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fCode.data());
-    m_program.addCacheableShaderFromSourceFile(QOpenGLShader::Fragment,":/glsl/earth.fsh");
+    m_program.addCacheableShaderFromSourceFile(QOpenGLShader::Fragment,":/glsl/earth.frag");
     //链接着色器程序
     m_program.link();
     ////着色器程序位置属性
@@ -132,7 +132,7 @@ void OpenGLWidget::initializeGL()
     //Q_ASSERT(m_colAttr != -1);
 
     //m_model = new Model("model/nanosuit/nanosuit.obj");
-    m_model = new Model("../../source/model/earth 2K.obj");
+    m_model = new Model("./source/model/Earth 2K/earth 2K.obj");
 
     //QString path = QCoreApplication::applicationDirPath();
     //QImage picture(path + "/../../model/textures/Diffuse_2K.png");
@@ -142,8 +142,8 @@ void OpenGLWidget::initializeGL()
     //m_texture->setMinMagFilters(QOpenGLTexture::Nearest,QOpenGLTexture::Linear);
 
 
-    m_skyProgram.addCacheableShaderFromSourceFile(QOpenGLShader::Vertex, ":/glsl/sky.vsh");
-    m_skyProgram.addCacheableShaderFromSourceFile(QOpenGLShader::Fragment, ":/glsl/sky.fsh");
+    m_skyProgram.addCacheableShaderFromSourceFile(QOpenGLShader::Vertex, ":/glsl/sky.vert");
+    m_skyProgram.addCacheableShaderFromSourceFile(QOpenGLShader::Fragment, ":/glsl/sky.frag");
     m_skyProgram.link();
 
     glGenBuffers(1, &m_skyVBO);
@@ -156,28 +156,28 @@ void OpenGLWidget::initializeGL()
 
     QStringList faces
     {
-        ":/model/skybox/right.jpg",
-        ":/model/skybox/left.jpg",
-        ":/model/skybox/top.jpg",
-        ":/model/skybox/bottom.jpg",
-        ":/model/skybox/front.jpg",
-        ":/model/skybox/back.jpg"
+        ":/png/skybox/right.jpg",
+        ":/png/skybox/left.jpg",
+        ":/png/skybox/top.jpg",
+        ":/png/skybox/bottom.jpg",
+        ":/png/skybox/front.jpg",
+        ":/png/skybox/back.jpg"
     };
 
     std::vector<std::string> faces1
     {
-        ":/model/skybox/right.jpg",
-        ":/model/skybox/left.jpg",
-        ":/model/skybox/top.jpg",
-        ":/model/skybox/bottom.jpg",
-        ":/model/skybox/front.jpg",
-        ":/model/skybox/back.jpg"
+        ":/png/skybox/right.jpg",
+        ":/png/skybox/left.jpg",
+        ":/png/skybox/top.jpg",
+        ":/png/skybox/bottom.jpg",
+        ":/png/skybox/front.jpg",
+        ":/png/skybox/back.jpg"
     };
     cubemapTexture = loadCubemap(faces1);
 
-    m_skyTexture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
-    
-    loadCubemap(faces,m_skyTexture);
+//    m_skyTexture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
+//
+//    loadCubemap(faces,m_skyTexture);
 
 
     this->m_uniformBlockIndexEarth = glGetUniformBlockIndex(this->m_program.programId(), "Matrices");

@@ -173,8 +173,10 @@ void DecodeThread::run() {
         if (seekRequested) {
             QMutexLocker locker(&mutex);
             av_seek_frame(m_avFormatCxt, -1, seekTime, AVSEEK_FLAG_BACKWARD);
-            avcodec_flush_buffers(audioCodecContext);
-            avcodec_flush_buffers(videoCodecContext);
+            if(audioCodecContext)
+                avcodec_flush_buffers(audioCodecContext);
+            if(videoCodecContext)
+                avcodec_flush_buffers(videoCodecContext);
             seekRequested = false;
             stopped = playStateChanged;
             if(!stopped){

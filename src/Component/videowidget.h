@@ -30,6 +30,8 @@ public:
     ~VideoWidget();
 
     void setAllTime(int64_t time);
+
+    void clearPage();
 public slots:
     void setFrame(QSharedPointer<AVFrame> frame);
 
@@ -67,6 +69,8 @@ private:
 
     int videoWidth;
     int videoHeight;
+
+    std::atomic<bool> isClear = false;
 
     void initializeShader();
     void initializeTextures();

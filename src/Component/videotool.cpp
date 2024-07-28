@@ -65,6 +65,10 @@ void VideoTool::setAllTime(int64_t duration)
     if(allTime == 0)
         return;
     init();
+    isPlay = true;
+    if(!isPlay){
+        ui->pauseButton->toggle();
+    }
 }
 
 void VideoTool::setPauseButtonToggle()
@@ -229,12 +233,9 @@ void VideoTool::init()
     long long seconds = allTime /AV_TIME_BASE % 60;
     durationStr = QString("%1:%2:%3").arg(hours,2,10, QChar('0')).arg(minutes,2,10, QChar('0')).arg(seconds,2,10, QChar('0'));
     ui->timeLabel->setText("00:00:00 / "+ durationStr);
-    emit sigVolumn(audioSlider->value());
     ui->timeSlider->setValue(0);
-    isPlay = true;
-    if(!isPlay){
-        ui->pauseButton->toggle();
-    }
+    audioSlider->setValue(100);
+    isPlay = false;
 }
 
 

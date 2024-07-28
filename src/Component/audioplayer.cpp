@@ -18,6 +18,7 @@ void AudioPlayer::setAudioSink(QAudioSink *audioSink, QIODevice *audioIODevice)
 {
     this->audioSink = audioSink;
     this->audioIODevice = audioIODevice;
+    setVolumn(100);
 }
 
 void AudioPlayer::stop()

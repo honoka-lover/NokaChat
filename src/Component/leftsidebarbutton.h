@@ -11,12 +11,17 @@ class LeftSideBarButton;
 class LeftSideBarButton : public QWidget
 {
     Q_OBJECT
+signals:
+    void selectStyle(int);
 
 public:
     explicit LeftSideBarButton(QWidget *parent = nullptr);
     ~LeftSideBarButton();
 
     void InitItemStyle();
+
+private slots:
+    void on_listWidget_clicked(const QModelIndex &index);
 
 private:
     Ui::LeftSideBarButton *ui;

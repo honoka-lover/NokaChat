@@ -49,7 +49,7 @@ void LeftSideBarButton::InitItemStyle()
 
     this->setStyleSheet("border-style:flat;");
 
-
+    ui->listWidget->setCurrentRow(0);
 }
 
 void LeftSideBarButton::resizeEvent(QResizeEvent *event)
@@ -89,3 +89,10 @@ bool LeftSideBarButton::eventFilter(QObject *watched, QEvent *event)
         return false;
     }
 }
+
+void LeftSideBarButton::on_listWidget_clicked(const QModelIndex &index)
+{
+    int n = index.row();
+    emit selectStyle(n);
+}
+

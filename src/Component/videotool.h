@@ -34,6 +34,8 @@ public:
     void addTime();
 
     void setMoveTimeInterval(int second);
+
+    void init();
 protected:
     bool eventFilter(QObject *watched,QEvent*event);
 
@@ -76,8 +78,6 @@ private:
     bool isPlay = false;
     bool isChanging = false;
     QMutex mutex;
-
-    void init();
 
 };
 

@@ -5,7 +5,7 @@
 #include <QWidget>
 #include "Component/leftsidebarbutton.h"
 #include <QVBoxLayout>
-#include "Component/mainfrom.h"
+#include <QSplitter>
 #include "Component/downloadsoft.h"
 #include "Component/musicPlayer/mymusicplayer.h"
 #include "Component/OpenGLWidget.h"
@@ -30,11 +30,13 @@ private:
 
     LeftSideBarButton *leftUI;
 
-    MainFrom *mainFrom;
-
     downloadSoft *downlaodTool;
 
-    QVBoxLayout LeftLayout,RightLayout;
+    QVBoxLayout *leftLayout,*rightLayout ,* middleLayout;
+
+    QSplitter *mainMenuSplitter;
+
+    QWidget *innerWidget;
 
 	MyMusicPlayer* mymusicplayer;
 
@@ -62,9 +64,13 @@ protected:
 private slots:
     void playFile(QString file);
 
+    void stopPlayVideo();
+
     void pauseVideo(bool ok);
 
     void exitFullScreen();
+
+    void setTypeList(int style);
 };
 
 #endif // MAINWIDGET_H

@@ -48,6 +48,20 @@ void VideoWidget::setAllTime(int64_t time)
         m_VideoTool->setAllTime(time);
         isPlay = true;
     }
+    //启动信号
+    isClear = false;
+}
+
+void VideoWidget::clearPage()
+{
+    m_VideoTool->hide();
+    m_VideoTool->init();
+    if (currentFrame) {
+        av_frame_free(&currentFrame);
+    }
+    currentFrame = nullptr;
+    isClear = true;
+    update();
 }
 
 void VideoWidget::initializeGL() {
@@ -205,6 +219,8 @@ void VideoWidget::paintGL() {
 
 void VideoWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    if(currentFrame == nullptr)
+        return;
     if(isFullScreen()){
         // showNormal();
         this->setWindowFlags(windowFlag);
@@ -257,6 +273,8 @@ bool VideoWidget::eventFilter(QObject *watched, QEvent *event)
 // }
 
 void VideoWidget::setFrame(QSharedPointer<AVFrame> frame) {
+    if(isClear)
+        return;
     QMutexLocker locker(&frameMutex);
     if (currentFrame) {
         av_frame_free(&currentFrame);
