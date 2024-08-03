@@ -7,10 +7,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-# set(CMAKE_PREFIX_PATH "E:/qt6/6.5.2/mingw_64/lib/cmake")
-#set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/mingw_64/lib/cmake")
-#set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
-set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
+if(MSVC)
+    # Visual Studio specific settings
+    set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
+else()
+    # MinGW specific settings
+    set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/mingw_64/lib/cmake")
+endif()
 
 find_package(Qt6 COMPONENTS
         Core
@@ -21,14 +24,13 @@ find_package(Qt6 COMPONENTS
         OpenGLWidgets
         REQUIRED)
 
-
 # 设置源文件目录
 set(SRC_DIR "src")
 
 set(INCLUDE_DIR "include")
 # 定义一个函数来递归获取目录中的所有文件
 function(get_all_files_in_directory DIR RESULT)
-    file(GLOB_RECURSE ALL_FILES "${DIR}/*.h" "${DIR}/*.cpp" "${DIR}/*.ui" )
+    file(GLOB_RECURSE ALL_FILES "${DIR}/*.h" "${DIR}/*.cpp" "${DIR}/*.ui" "${DIR}/*.hpp")
 
     set(${RESULT} ${ALL_FILES} PARENT_SCOPE)
 endfunction()
@@ -59,11 +61,11 @@ foreach(FILE ${ALL_HEAD_FILES})
 endforeach()
 
 # 打印过滤后的文件列表（可选，用于调试）
-message(STATUS "Filtered source files: ${FILTERED_SRC_FILES}")
+# message(STATUS "Filtered source files: ${FILTERED_SRC_FILES}")
 
 include_directories(src include)
 file(GLOB LibFile "lib/*.lib")
-file(GLOB DllFile "lib/*.dll")
+file(GLOB DllFile "dll/*.dll")
 add_executable(Vanilla
         ${FILTERED_SRC_FILES}
         ${FILTERED_HEAD_FILES}
@@ -80,15 +82,22 @@ target_link_libraries(Vanilla
         Qt::OpenGLWidgets
         ${LibFile}
 )
+set(NAME "Vanilla")
+#设置输出目录
+if(WIN32)
+        set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
+        set_target_properties(${NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Debug")
+endif(WIN32)
+
 #复制dll和配置文件到执行目录
-configure_file(source/setting.ini ${CMAKE_CURRENT_BINARY_DIR}/setting.ini COPYONLY)
-file(COPY ${DllFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(GLOB SourceFile "source/model")
-file(COPY ${SourceFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/source)
+configure_file(source/setting.ini ${CMAKE_SOURCE_DIR}/bin/setting.ini COPYONLY)
+file(COPY ${DllFile} DESTINATION ${CMAKE_SOURCE_DIR}/bin)
+# file(GLOB SourceFile "source/model")
+# file(COPY ${SourceFile} DESTINATION ${CMAKE_SOURCE_DIR}/bin/source)
 # 安装文件
-install(TARGETS Vanilla DESTINATION .)
-install(FILES ${LibFile} ${DllFile} DESTINATION .)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setting.ini DESTINATION .)
+install(TARGETS Vanilla DESTINATION bin)
+install(FILES ${LibFile} ${DllFile} DESTINATION bin)
+install(FILES ${CMAKE_SOURCE_DIR}/bin/setting.ini DESTINATION bin)
 set(SOURCE_DIR  "source/model")
 install(DIRECTORY  ${SOURCE_DIR} DESTINATION source)
 #install(FILES ${FILTERED_HEAD_FILES} DESTINATION include)

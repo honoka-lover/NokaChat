@@ -132,7 +132,7 @@ void OpenGLWidget::initializeGL()
     //Q_ASSERT(m_colAttr != -1);
 
     //m_model = new Model("model/nanosuit/nanosuit.obj");
-    m_model = new Model("./source/model/Earth 2K/earth 2K.obj");
+    m_model = new Model("../source/model/Earth 2K/earth 2K.obj");
 
     //QString path = QCoreApplication::applicationDirPath();
     //QImage picture(path + "/../../model/textures/Diffuse_2K.png");

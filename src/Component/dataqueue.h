@@ -15,7 +15,7 @@ extern "C"{
 #include <queue>
 #include <mutex>
 #include <condition_variable>
-
+#include <atomic>
 template <typename T>
 class DataQueue {
 public:

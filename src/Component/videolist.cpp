@@ -90,9 +90,12 @@ void VideoList::playVideo(const QModelIndex &index)
 
 void VideoList::clearTree()
 {
-    QList<QStandardItem*> childItems = m_model.invisibleRootItem()->takeRow(0); // 获取第一个子项并将其从模型中移除
-    for (QStandardItem *item : childItems) {
-        delete item; // 删除子项
+    int len = m_model.rowCount();
+    for(int i=0;i<len;i++){
+        QList<QStandardItem*> childItems = m_model.takeRow(0);
+        for (QStandardItem *item : childItems) {
+            delete item; // 删除子项
+        }
     }
 }
 

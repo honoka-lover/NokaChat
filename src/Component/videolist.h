@@ -18,7 +18,7 @@
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QLabel>
-
+#include <QToolButton>
 class VideoList : public QWidget
 {
     Q_OBJECT
