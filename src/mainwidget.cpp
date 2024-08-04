@@ -118,8 +118,10 @@ void MainWidget::init()
     middleLayout->addWidget(videoPlayer);
 
     //左边frame窗口
+    QSurfaceFormat format1;
+    format1.setOption(QSurfaceFormat::DebugContext);
     openGLWidget = new OpenGLWidget(this);
-    openGLWidget->setFormat(format);
+    openGLWidget->setFormat(format1);
     openGLWidget->StartAnimating();
     middleLayout->addWidget(openGLWidget);
 

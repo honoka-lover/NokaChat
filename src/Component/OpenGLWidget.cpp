@@ -114,6 +114,27 @@ void OpenGLWidget::initializeGL()
     // 为当前环境初始化OpenGL函数
     initializeOpenGLFunctions();
 
+    // 获取当前上下文
+    context = QOpenGLContext::currentContext();
+    if (!context) {
+        qWarning() << "No current OpenGL context.";
+    }
+    // 确保上下文是调试上下文
+    if (!context->format().testOption(QSurfaceFormat::DebugContext)) {
+        qWarning() << "Current OpenGL context is not a debug context.";
+    }
+    qDebug()<<"suggest GL_KHR_debug:"<<context->hasExtension(QByteArrayLiteral("GL_KHR_debug"));
+    m_GLlogger = new QOpenGLDebugLogger(this);
+    connect(m_GLlogger, &QOpenGLDebugLogger::messageLogged, this, [](const QOpenGLDebugMessage& message) {
+        qDebug() << "OpenGL debug message:" << message.message();
+        });
+    if (m_GLlogger->initialize()) {
+        m_GLlogger->startLogging(QOpenGLDebugLogger::SynchronousLogging);
+    }
+    else {
+        qWarning() << "Failed to initialize QOpenGLDebugLogger";
+    }
+
     //加载顶点着色器程序
     // m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vCode.data());
     m_program.addCacheableShaderFromSourceFile(QOpenGLShader::Vertex,":/glsl/earth.vert");
@@ -131,8 +152,7 @@ void OpenGLWidget::initializeGL()
     ////断言是否成功
     //Q_ASSERT(m_colAttr != -1);
 
-    //m_model = new Model("model/nanosuit/nanosuit.obj");
-    m_model = new Model("../source/model/Earth 2K/earth 2K.obj");
+    m_model = new Model("../resources/model/Earth 2K/earth 2K.obj");
 
     //QString path = QCoreApplication::applicationDirPath();
     //QImage picture(path + "/../../model/textures/Diffuse_2K.png");
@@ -154,7 +174,7 @@ void OpenGLWidget::initializeGL()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-    QStringList faces
+    std::vector<std::string> faces
     {
         ":/png/skybox/right.jpg",
         ":/png/skybox/left.jpg",
@@ -163,22 +183,7 @@ void OpenGLWidget::initializeGL()
         ":/png/skybox/front.jpg",
         ":/png/skybox/back.jpg"
     };
-
-    std::vector<std::string> faces1
-    {
-        ":/png/skybox/right.jpg",
-        ":/png/skybox/left.jpg",
-        ":/png/skybox/top.jpg",
-        ":/png/skybox/bottom.jpg",
-        ":/png/skybox/front.jpg",
-        ":/png/skybox/back.jpg"
-    };
-    cubemapTexture = loadCubemap(faces1);
-
-//    m_skyTexture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
-//
-//    loadCubemap(faces,m_skyTexture);
-
+    cubemapTexture = loadCubemap(faces);
 
     this->m_uniformBlockIndexEarth = glGetUniformBlockIndex(this->m_program.programId(), "Matrices");
     this->m_uniformBlockIndexSky = glGetUniformBlockIndex(this->m_skyProgram.programId(), "Matrices");
@@ -198,25 +203,6 @@ void OpenGLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_ALWAYS);
 }
-
-void OpenGLWidget::loadCubemap(QStringList faces,QOpenGLTexture *texture)
-{
-    texture->create();
-    texture->bind();
-    for (unsigned int i = 0; i < faces.size(); i++)
-    {
-        QImage pic(faces[i]);
-        texture->setData(i, QOpenGLTexture::CubeMapPositiveX + i,
-            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-            pic.bits(), Q_NULLPTR);
-    }
-    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    texture->setMagnificationFilter(QOpenGLTexture::Linear);
-    texture->setWrapMode(QOpenGLTexture::ClampToEdge);
-    texture->release();
-}
-
-
 
 void OpenGLWidget::paintGL()
 {

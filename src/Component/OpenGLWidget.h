@@ -4,8 +4,9 @@
 #include <qopengltexture.h>
 #include <qvector3d.h>
 #include "Camera.h"
-#include "Model.h"
+#include "model.h"
 #include "QOpenGLBuffer"
+#include <QOpenGLDebugLogger>
 class QOpenGLShaderProgram;
 class OpenGLWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
@@ -27,10 +28,6 @@ protected:
     bool eventFilter(QObject* watched, QEvent* event);
 
 private:
-    void loadModel(const QString &path);
-
-    void loadCubemap(QStringList faces,QOpenGLTexture *);
-
     unsigned int loadCubemap(vector<std::string> faces);
 
 private:
@@ -66,5 +63,9 @@ private:
 
     GLuint m_uniformBlockIndexEarth, m_uniformBlockIndexSky;
     GLuint m_uboMatrices;
+
+    //打印openGL的debug报错
+    QOpenGLDebugLogger* m_GLlogger;
+    QOpenGLContext* context;
 };
 

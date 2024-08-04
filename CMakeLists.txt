@@ -69,8 +69,8 @@ file(GLOB DllFile "dll/*.dll")
 add_executable(Vanilla
         ${FILTERED_SRC_FILES}
         ${FILTERED_HEAD_FILES}
-        source/resource.qrc
-        source/myicon.rc
+        resources/resource.qrc
+        resources/myicon.rc
 )
 target_link_libraries(Vanilla
         PRIVATE
@@ -90,7 +90,7 @@ if(WIN32)
 endif(WIN32)
 
 #复制dll和配置文件到执行目录
-configure_file(source/setting.ini ${CMAKE_SOURCE_DIR}/bin/setting.ini COPYONLY)
+configure_file(resources/setting.ini ${CMAKE_SOURCE_DIR}/bin/setting.ini COPYONLY)
 file(COPY ${DllFile} DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 # file(GLOB SourceFile "source/model")
 # file(COPY ${SourceFile} DESTINATION ${CMAKE_SOURCE_DIR}/bin/source)
@@ -98,8 +98,8 @@ file(COPY ${DllFile} DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 install(TARGETS Vanilla DESTINATION bin)
 install(FILES ${LibFile} ${DllFile} DESTINATION bin)
 install(FILES ${CMAKE_SOURCE_DIR}/bin/setting.ini DESTINATION bin)
-set(SOURCE_DIR  "source/model")
-install(DIRECTORY  ${SOURCE_DIR} DESTINATION source)
+set(SOURCE_DIR  "resources/model")
+install(DIRECTORY  ${SOURCE_DIR} DESTINATION resources)
 #install(FILES ${FILTERED_HEAD_FILES} DESTINATION include)
 # 打包
 set(CPACK_PACKAGE_NAME "Vanilla")
