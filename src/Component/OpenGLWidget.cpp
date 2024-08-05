@@ -176,12 +176,12 @@ void OpenGLWidget::initializeGL()
 
     std::vector<std::string> faces
     {
-        ":/png/skybox/right.jpg",
-        ":/png/skybox/left.jpg",
-        ":/png/skybox/top.jpg",
-        ":/png/skybox/bottom.jpg",
-        ":/png/skybox/front.jpg",
-        ":/png/skybox/back.jpg"
+        "../resources/skybox/right.jpg",
+        "../resources/skybox/left.jpg",
+        "../resources/skybox/top.jpg",
+        "../resources/skybox/bottom.jpg",
+        "../resources/skybox/front.jpg",
+        "../resources/skybox/back.jpg"
     };
     cubemapTexture = loadCubemap(faces);
 

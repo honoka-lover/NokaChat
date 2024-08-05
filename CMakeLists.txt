@@ -15,6 +15,8 @@ else()
     set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/mingw_64/lib/cmake")
 endif()
 
+#message("CMAKE_PREFIX_PATH: "${CMAKE_PREFIX_PATH})
+
 find_package(Qt6 COMPONENTS
         Core
         Gui
@@ -64,8 +66,14 @@ endforeach()
 # message(STATUS "Filtered source files: ${FILTERED_SRC_FILES}")
 
 include_directories(src include)
-file(GLOB LibFile "lib/*.lib")
-file(GLOB DllFile "dll/*.dll")
+if (MSCV)
+    file(GLOB LibFile "lib/*.lib" "lib/msvc/*.lib" "lib/*.dll.a" "lib/mingw/*.dll.a")
+    file(GLOB DllFile "dll/*.dll" "dll/msvc/*.dll")
+else ()
+    file(GLOB LibFile "lib/*.lib" "lib/mingw/*.lib" "lib/*.dll.a" "lib/mingw/*.dll.a")
+    file(GLOB DllFile "dll/*.dll" "dll/mingw/*.dll")
+endif ()
+
 add_executable(Vanilla
         ${FILTERED_SRC_FILES}
         ${FILTERED_HEAD_FILES}
@@ -94,6 +102,7 @@ configure_file(resources/setting.ini ${CMAKE_SOURCE_DIR}/bin/setting.ini COPYONL
 file(COPY ${DllFile} DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 # file(GLOB SourceFile "source/model")
 # file(COPY ${SourceFile} DESTINATION ${CMAKE_SOURCE_DIR}/bin/source)
+
 # 安装文件
 install(TARGETS Vanilla DESTINATION bin)
 install(FILES ${LibFile} ${DllFile} DESTINATION bin)
