@@ -51,7 +51,6 @@ private:
 
     VideoList *videoList;
 
-    void setComponentVisible();
 
     void init();
 

@@ -15,5 +15,7 @@
         <file>glsl/earth.vert</file>
         <file>glsl/sky.frag</file>
         <file>glsl/sky.vert</file>
+        <file>glsl/text.vert</file>
+        <file>glsl/text.frag</file>
     </qresource>
 </RCC>

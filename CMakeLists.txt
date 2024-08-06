@@ -39,11 +39,8 @@ endfunction()
 
 # 调用函数以获取所有文件
 get_all_files_in_directory(${SRC_DIR} ALL_SRC_FILES)
-
-get_all_files_in_directory(${INCLUDE_DIR} ALL_HEAD_FILES)
 # 创建一个新的列表来存储过滤后的文件
 set(FILTERED_SRC_FILES)
-set(FILTERED_HEAD_FILES)
 # 遍历所有文件
 foreach(FILE ${ALL_SRC_FILES})
     # 获取文件名
@@ -55,18 +52,12 @@ foreach(FILE ${ALL_SRC_FILES})
         list(APPEND FILTERED_SRC_FILES ${FILE})
     endif()
 endforeach()
-#遍历include中头文件
-foreach(FILE ${ALL_HEAD_FILES})
-    # 获取文件名
-    get_filename_component(FILENAME ${FILE} NAME)
-    list(APPEND FILTERED_HEAD_FILES ${FILE})
-endforeach()
 
 # 打印过滤后的文件列表（可选，用于调试）
 # message(STATUS "Filtered source files: ${FILTERED_SRC_FILES}")
 
-include_directories(src include)
-if (MSCV)
+include_directories(src include include/freetype)
+if (MSVC)
     file(GLOB LibFile "lib/*.lib" "lib/msvc/*.lib" "lib/*.dll.a" "lib/mingw/*.dll.a")
     file(GLOB DllFile "dll/*.dll" "dll/msvc/*.dll")
 else ()
@@ -76,7 +67,6 @@ endif ()
 
 add_executable(Vanilla
         ${FILTERED_SRC_FILES}
-        ${FILTERED_HEAD_FILES}
         resources/resource.qrc
         resources/myicon.rc
 )

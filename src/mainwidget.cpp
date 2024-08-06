@@ -16,6 +16,10 @@ MainWidget::MainWidget(QWidget *parent)
     , decode(nullptr)
     , audioThread(nullptr)
     , videoThread(nullptr)
+    , videoPlayer(nullptr)
+    , downlaodTool(nullptr)
+    , innerWidget(nullptr)
+    , videoList(nullptr)
 {
     ui->setupUi(this);
 
@@ -26,7 +30,6 @@ MainWidget::MainWidget(QWidget *parent)
     this->setStyleSheet(file.readAll());
     file.close();
 
-    setComponentVisible();
     setTypeList(0);
 
     connect(videoList,&VideoList::sigFileName,this,&MainWidget::playFile);
@@ -63,20 +66,6 @@ MainWidget::~MainWidget()
     delete ui;
 }
 
-void MainWidget::setComponentVisible()
-{
-    // leftUI->hide();
-
-    downlaodTool->hide();
-
-    mymusicplayer->hide();
-    videoPlayer->hide();
-    if(openGLWidget)
-        openGLWidget->hide();
-
-   // videoList->hide();
-}
-
 void MainWidget::init()
 {
     ui->frame->setMinimumWidth(200);
@@ -107,37 +96,6 @@ void MainWidget::init()
     mainMenuSplitter->addWidget(leftUI);
     mainMenuSplitter->addWidget(innerWidget);
     mainMenuSplitter->setSizes(QList<int>()<<200<<600<<600);
-
-    //左边frame窗口
-    QSurfaceFormat format;
-    //设置每个每个像素采样样本个数，用于抗锯齿
-    format.setSamples(16);
-    videoPlayer = new VideoWidget(this);
-    videoPlayer->setFormat(format);
-    videoPlayer->show();
-    middleLayout->addWidget(videoPlayer);
-
-    //左边frame窗口
-    QSurfaceFormat format1;
-    format1.setOption(QSurfaceFormat::DebugContext);
-    openGLWidget = new OpenGLWidget(this);
-    openGLWidget->setFormat(format1);
-    openGLWidget->StartAnimating();
-    middleLayout->addWidget(openGLWidget);
-
-    //右边frame窗口
-    downlaodTool = new downloadSoft(this);
-    rightLayout->addWidget(downlaodTool);
-
-    //右边frame窗口
-    mymusicplayer = new MyMusicPlayer(this);
-    rightLayout->addWidget(mymusicplayer);
-
-    //右边frame窗口
-    videoList = new VideoList(this);
-    rightLayout->addWidget(videoList);
-
-
 
     innerWidget->setLayout(middleLayout);
     ui->frame->setLayout(leftLayout);
@@ -261,24 +219,64 @@ void MainWidget::exitFullScreen()
 
 void MainWidget::setTypeList(int style)
 {
+    //隐藏所有组件
+    if(videoPlayer)
+        videoPlayer->hide();
+    if(videoList)
+        videoList->hide();
+    if(openGLWidget)
+        openGLWidget->hide();
+    if(downlaodTool)
+        downlaodTool->hide();
+    if(mymusicplayer)
+        mymusicplayer->hide();
+
     if(style == 0){
+        if(!videoPlayer){
+            //左边frame窗口
+            QSurfaceFormat format;
+            //设置每个每个像素采样样本个数，用于抗锯齿
+            format.setSamples(16);
+            videoPlayer = new VideoWidget(this);
+            videoPlayer->setFormat(format);
+            middleLayout->addWidget(videoPlayer);
+        }
+        if(!videoList){
+            //右边frame窗口
+            videoList = new VideoList(this);
+            rightLayout->addWidget(videoList);
+        }
+
         videoPlayer->show();
         ui->frame_2->show();
         videoList->show();
-
-        openGLWidget->hide();
-        downlaodTool->hide();
-        mymusicplayer->hide();
-
-
     }else if(style == 1){
-        stopPlayVideo();
-        videoPlayer->hide();
+        if(videoPlayer)
+            stopPlayVideo();
+        if(!openGLWidget){
+            //左边frame窗口
+            QSurfaceFormat format1;
+            format1.setOption(QSurfaceFormat::DebugContext);
+            openGLWidget = new OpenGLWidget(this);
+            openGLWidget->setFormat(format1);
+            openGLWidget->StartAnimating();
+            middleLayout->addWidget(openGLWidget);
+        }
         ui->frame_2->hide();
-
         openGLWidget->show();
-        downlaodTool->hide();
-        mymusicplayer->hide();
+    }else{
+        if(!downlaodTool){
+            //右边frame窗口
+            downlaodTool = new downloadSoft(this);
+            rightLayout->addWidget(downlaodTool);
+        }
+
+        if(!mymusicplayer){
+            //右边frame窗口
+            mymusicplayer = new MyMusicPlayer(this);
+            rightLayout->addWidget(mymusicplayer);
+        }
+
     }
 }
 

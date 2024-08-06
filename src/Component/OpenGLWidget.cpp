@@ -198,7 +198,8 @@ void OpenGLWidget::initializeGL()
 
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_uboMatrices, 0, 2 * 64);
 
-   
+    m_textTexture = new TextTexture;
+
     //深度测试
     glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_ALWAYS);
@@ -262,6 +263,8 @@ void OpenGLWidget::paintGL()
     glDepthFunc(GL_LESS);
     glBindVertexArray(0);
     m_skyProgram.release();
+
+    m_textTexture->RenderText(QString("你好").toStdU32String(),0,10,40,QColor("#ff0000"));
 }
 
 void OpenGLWidget::resizeGL(int width, int height)
@@ -270,7 +273,7 @@ void OpenGLWidget::resizeGL(int width, int height)
     const qreal retinaScale = devicePixelRatio();
     //设置视口
     glViewport(0, 0, width * retinaScale, height * retinaScale);
-
+    m_textTexture->updateWindowSize(width,height);
 }
 
 bool OpenGLWidget::eventFilter(QObject* watched, QEvent* event)

@@ -1,9 +1,6 @@
-﻿
-#include "mainwidget.h"
+﻿#include "mainwidget.h"
 
 #include <QApplication>
-
-
 #include <QSslSocket>
 #include <iostream>
 #include <QMediaDevices>

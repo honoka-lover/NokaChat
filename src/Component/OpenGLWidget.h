@@ -7,6 +7,7 @@
 #include "model.h"
 #include "QOpenGLBuffer"
 #include <QOpenGLDebugLogger>
+#include "TextTexture.h"
 class QOpenGLShaderProgram;
 class OpenGLWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
@@ -63,6 +64,8 @@ private:
 
     GLuint m_uniformBlockIndexEarth, m_uniformBlockIndexSky;
     GLuint m_uboMatrices;
+
+    TextTexture *m_textTexture;
 
     //打印openGL的debug报错
     QOpenGLDebugLogger* m_GLlogger;
