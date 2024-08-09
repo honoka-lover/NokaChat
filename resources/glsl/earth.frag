@@ -14,6 +14,6 @@ void main()
     float ratio = 1.00 / 2.42;
     vec3 I = normalize(Position - cameraPos);
     vec3 R = refract(I, normalize(Normal), ratio);   
-    FragColor = vec4(mix(texture(texture_diffuse1, TexCoords), texture(skybox, R), 0.8).rgb, 1.0);
+    FragColor = vec4(mix(texture(texture_diffuse1, TexCoords), texture(skybox, R), 0).rgb, 1.0);
 }
 

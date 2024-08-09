@@ -17,5 +17,15 @@
         <file>glsl/sky.vert</file>
         <file>glsl/text.vert</file>
         <file>glsl/text.frag</file>
+        <file>glsl/hdrBackground.vert</file>
+        <file>glsl/hdrBackground.frag</file>
+        <file>glsl/pbr.vert</file>
+        <file>glsl/pbr.frag</file>
+        <file>glsl/cubemap.vert</file>
+        <file>glsl/equirectangular_to_cubemap.frag</file>
+        <file>glsl/irradiance_convolution.frag</file>
+        <file>glsl/brdf.frag</file>
+        <file>glsl/brdf.vert</file>
+        <file>glsl/prefilter.frag</file>
     </qresource>
 </RCC>

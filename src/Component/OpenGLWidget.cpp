@@ -13,55 +13,9 @@
 #include <QtCore/qbuffer.h>
 #include <iostream>
 
-float skyboxVertices[] = {
-    // positions          
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-
-    -1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-
-    -1.0f, -1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-
-    -1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f, -1.0f,
-
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f
-};
-
-
 OpenGLWidget::OpenGLWidget(QWidget* parent)
-    : QOpenGLWidget(parent),
-    m_camera(new Camera(QVector3D(0.0f, 0.0f, 15.0f)))
+        : QOpenGLWidget(parent),
+          m_camera(new Camera(QVector3D(0.0f, 0.0f, 15.0f)))
 {
     m_oldXPos = 0.0;
     m_oldYPos = 0.0;
@@ -70,7 +24,7 @@ OpenGLWidget::OpenGLWidget(QWidget* parent)
     QObject::connect(m_timer, &QTimer::timeout, [this]() {
         this->update();
 
-        });
+    });
 
     installEventFilter(this);
     //捕获键盘输入
@@ -86,27 +40,6 @@ OpenGLWidget::~OpenGLWidget()
 void OpenGLWidget::StartAnimating()
 {
     m_timer->start(10);
-}
-
-unsigned int OpenGLWidget::loadCubemap(vector<std::string> faces)
-{
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-    for (unsigned int i = 0; i < faces.size(); i++)
-    {
-        QImage image(QString::fromStdString(faces[i]));
-        image = image.convertToFormat(QImage::Format_RGBA8888);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    return textureID;
 }
 
 void OpenGLWidget::initializeGL()
@@ -127,7 +60,7 @@ void OpenGLWidget::initializeGL()
     m_GLlogger = new QOpenGLDebugLogger(this);
     connect(m_GLlogger, &QOpenGLDebugLogger::messageLogged, this, [](const QOpenGLDebugMessage& message) {
         qDebug() << "OpenGL debug message:" << message.message();
-        });
+    });
     if (m_GLlogger->initialize()) {
         m_GLlogger->startLogging(QOpenGLDebugLogger::SynchronousLogging);
     }
@@ -143,53 +76,32 @@ void OpenGLWidget::initializeGL()
     m_program.addCacheableShaderFromSourceFile(QOpenGLShader::Fragment,":/glsl/earth.frag");
     //链接着色器程序
     m_program.link();
-    ////着色器程序位置属性
-    //m_posAttr = m_program->attributeLocation("aPos");
-    ////断言是否成功
-    //Q_ASSERT(m_posAttr != -1);
-    ////着色器程序颜色属性
-    //m_colAttr = m_program->attributeLocation("aTexCoords");
-    ////断言是否成功
-    //Q_ASSERT(m_colAttr != -1);
 
     m_model = new Model("../resources/model/Earth 2K/earth 2K.obj");
+    // m_model = new Model("../resources/model/hutao.fbx");
 
-    //QString path = QCoreApplication::applicationDirPath();
-    //QImage picture(path + "/../../model/textures/Diffuse_2K.png");
-    //picture = picture.convertToFormat(QImage::Format_RGBA8888);
-    //m_texture = new QOpenGLTexture(picture);
-    //m_texture->setWrapMode(QOpenGLTexture::ClampToEdge);
-    //m_texture->setMinMagFilters(QOpenGLTexture::Nearest,QOpenGLTexture::Linear);
-
-
-    m_skyProgram.addCacheableShaderFromSourceFile(QOpenGLShader::Vertex, ":/glsl/sky.vert");
-    m_skyProgram.addCacheableShaderFromSourceFile(QOpenGLShader::Fragment, ":/glsl/sky.frag");
-    m_skyProgram.link();
-
-    glGenBuffers(1, &m_skyVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_skyVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
-    glGenVertexArrays(1, &m_skyVAO);
-    glBindVertexArray(m_skyVAO);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-    std::vector<std::string> faces
-    {
-        "../resources/skybox/right.jpg",
-        "../resources/skybox/left.jpg",
-        "../resources/skybox/top.jpg",
-        "../resources/skybox/bottom.jpg",
-        "../resources/skybox/front.jpg",
-        "../resources/skybox/back.jpg"
+    QStringList faces
+            {
+                    "../resources/skybox/right.jpg",
+                    "../resources/skybox/left.jpg",
+                    "../resources/skybox/top.jpg",
+                    "../resources/skybox/bottom.jpg",
+                    "../resources/skybox/front.jpg",
+                    "../resources/skybox/back.jpg"
+            };
+    QStringList hdrPic{
+            "../resources/hdr/chapel_day_8k.hdr"
     };
-    cubemapTexture = loadCubemap(faces);
+    m_back = new SkyBox;
+//    m_back->setSource(faces,SkyBox::SkyBoxPic_6);
+     m_back->setSource(hdrPic,SkyBox::HDR_MODEL);
+
+    m_pbrBall.setTexturePath("../resources/pbr/gold");
+    m_pbrBall.setCubeMap(m_back->getCubeMapID());
+    m_pbrBall.setFrameBuffer(m_back->getCaptureFBO(),m_back->getCaptureRBO());
 
     this->m_uniformBlockIndexEarth = glGetUniformBlockIndex(this->m_program.programId(), "Matrices");
-    this->m_uniformBlockIndexSky = glGetUniformBlockIndex(this->m_skyProgram.programId(), "Matrices");
-
     glUniformBlockBinding(m_program.programId(), m_uniformBlockIndexEarth, 0);
-    glUniformBlockBinding(m_skyProgram.programId(), m_uniformBlockIndexSky, 0);
 
     glGenBuffers(1, &m_uboMatrices);
     glBindBuffer(GL_UNIFORM_BUFFER, m_uboMatrices);
@@ -242,27 +154,24 @@ void OpenGLWidget::paintGL()
     model.scale(1,1,1);
     m_program.setUniformValue("model", model);
 
-    m_program.setUniformValue("cameraPos;", m_camera->Position);
+    m_program.setUniformValue("cameraPos", m_camera->Position);
     m_model->Draw(&m_program);
     m_program.release();
 
+    m_back->setViewMatrix(QMatrix4x4(m_camera->GetViewMatrix3x3()),m_uboMatrices);
 
-    glDepthFunc(GL_LEQUAL);
-    m_skyProgram.bind();
-    view = QMatrix4x4(m_camera->GetViewMatrix3x3());
-    //m_skyProgram.setUniformValue("view", view);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_uboMatrices);
-    glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, view.data());
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    
-    glBindVertexArray(m_skyVAO);
-    //m_skyTexture->bind();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glDepthFunc(GL_LESS);
-    glBindVertexArray(0);
-    m_skyProgram.release();
+
+
+    auto pbrModel = glm::mat4(1.0f);
+    pbrModel = glm::translate(pbrModel, glm::vec3(1.0, 0.0, 2.0));
+    m_pbrBall.setUniformValue("model", pbrModel);
+    m_pbrBall.setUniformValue("normalMatrix", glm::transpose(glm::inverse(glm::mat3(pbrModel))));
+    m_pbrBall.setUniformValue("camPos", m_camera->Position);
+    m_pbrBall.setUniformValue("projection", projection);
+    m_pbrBall.setUniformValue("view", view);
+    m_pbrBall.Draw();
+
+    m_back->Draw();
 
     m_textTexture->RenderText(QString("你好").toStdU32String(),0,10,40,QColor("#ff0000"));
 }
@@ -316,19 +225,19 @@ bool OpenGLWidget::eventFilter(QObject* watched, QEvent* event)
         QKeyEvent* e = (QKeyEvent*)event;
         //qDebug() << "键盘按下";
         switch(e->key()) {
-        case Qt::Key_W:
-            m_camera->ProcessKeyboard(FORWARD, 1);
-            //qDebug() << "W按下";
-            break;
-        case Qt::Key_A:
-            m_camera->ProcessKeyboard(LEFT, 1);
-            break;
-        case Qt::Key_S:
-            m_camera->ProcessKeyboard(BACKWARD, 1);
-            break;
-        case Qt::Key_D:
-            m_camera->ProcessKeyboard(RIGHT, 1);
-            break;
+            case Qt::Key_W:
+                m_camera->ProcessKeyboard(FORWARD, 1);
+                //qDebug() << "W按下";
+                break;
+            case Qt::Key_A:
+                m_camera->ProcessKeyboard(LEFT, 1);
+                break;
+            case Qt::Key_S:
+                m_camera->ProcessKeyboard(BACKWARD, 1);
+                break;
+            case Qt::Key_D:
+                m_camera->ProcessKeyboard(RIGHT, 1);
+                break;
         }
     }
 

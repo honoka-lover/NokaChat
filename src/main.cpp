@@ -5,6 +5,7 @@
 #include <iostream>
 #include <QMediaDevices>
 #include <QOffscreenSurface>
+#include "Component/modelshowgl.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -34,6 +35,8 @@ int main(int argc, char *argv[])
     }
     MainWidget w;
     w.show();
+//    ModelShowGL show;
+//    show.show();
 
     return a.exec();
 }

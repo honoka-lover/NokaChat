@@ -22,10 +22,6 @@ TextTexture::TextTexture(){
 }
 
 void TextTexture::init() {
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     m_program.addCacheableShaderFromSourceFile(QOpenGLShader::Vertex, ":/glsl/text.vert");
     m_program.addCacheableShaderFromSourceFile(QOpenGLShader::Fragment, ":/glsl/text.frag");
     m_program.link();
@@ -68,6 +64,9 @@ void TextTexture::RenderText(std::u32string text, float x, float y, uint fontsiz
         std::cout<<"freetype库初始化失败";
         return;
     }
+//    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // activate corresponding render state
     m_program.bind();

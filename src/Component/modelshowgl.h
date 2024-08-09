@@ -4,6 +4,8 @@
 #include <QOpenGLExtraFunctions>
 #include "TextTexture.h"
 #include <QTimer>
+#include "pbrball.h"
+#include "Camera.h"
 class ModelShowGL : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
     Q_OBJECT
@@ -23,6 +25,8 @@ protected:
 private:
     TextTexture *m_textTexture;
     QTimer* m_timer;
+    PbrBall *m_pbrBall;
+    Camera *m_camera;
 };
 
 #endif // MODELSHOWGL_H
