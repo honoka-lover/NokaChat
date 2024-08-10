@@ -5,6 +5,7 @@
 #include <QAudioSink>
 #include <QIODevice>
 #include <QMutex>
+#include <QFileDialog>
 #include "Component/dataqueue.h"
 extern "C" {
 #include <libavformat/avformat.h>
@@ -21,7 +22,7 @@ public:
     ~AudioPlayer();
     void init();
 
-    void setAudioSink(QAudioSink* audioSink, QIODevice* audioIODevice);
+    void setAudioSink(QAudioSink* audioSink);
 
     void resume();
     void stop();

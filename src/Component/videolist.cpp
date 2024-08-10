@@ -19,7 +19,7 @@ VideoList::VideoList(QWidget* parent):
     layout->addWidget(innerWidget);
 
 
-    extensions << ".mp4" << ".mp3";
+    extensions << ".mp4" << ".mp3" << ".wmv" << ".flv";
 
     m_view->setModel(&m_model);
     m_view->setHeaderHidden(true);

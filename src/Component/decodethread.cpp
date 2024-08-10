@@ -5,6 +5,7 @@
 AVFormatContext* open_video_file(const char* filename) {
     AVFormatContext* pFormatContext = avformat_alloc_context();
     if (avformat_open_input(&pFormatContext, filename, nullptr, nullptr) != 0) {
+        qDebug()<<"avformat打不开文件:"+QString(filename);
         return nullptr;
     }
     return pFormatContext;
@@ -69,6 +70,9 @@ void DecodeThread::setFileName(QString file)
     }
     m_file = file;
     m_avFormatCxt = open_video_file(m_file.toStdString().c_str());
+    if (avformat_find_stream_info(m_avFormatCxt, NULL) < 0) {
+        qDebug()<<"avformat找不到流";
+    }
     initDecode();
     // 如果duration为负数，手动计算总时长
     if (m_avFormatCxt->duration < 0) {
@@ -88,15 +92,32 @@ void DecodeThread::setFileName(QString file)
 }
 
 void DecodeThread::initDecode() {
-    videoStreamIndex = av_find_best_stream(m_avFormatCxt, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
-    audioStreamIndex = av_find_best_stream(m_avFormatCxt, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+//    videoStreamIndex = av_find_best_stream(m_avFormatCxt, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+//    audioStreamIndex = av_find_best_stream(m_avFormatCxt, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+    int ret = av_find_best_stream(m_avFormatCxt, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+    if (ret < 0) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot find an audio stream in the input file\n");
+    }
+    audioStreamIndex = ret;
+
+    ret = av_find_best_stream(m_avFormatCxt, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+    if (ret < 0) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot find an video stream in the input file\n");
+    }
+    videoStreamIndex = ret;
+
+    if(m_file.endsWith("mp3")){
+        videoStreamIndex = -2;
+    }
 
     if (videoStreamIndex >= 0) {
         AVCodecParameters* codecParameters = m_avFormatCxt->streams[videoStreamIndex]->codecpar;
         const AVCodec* codec = avcodec_find_decoder(codecParameters->codec_id);
         videoCodecContext = avcodec_alloc_context3(codec);
         avcodec_parameters_to_context(videoCodecContext, codecParameters);
-        avcodec_open2(videoCodecContext, codec, nullptr);
+        int ret = avcodec_open2(videoCodecContext, codec, nullptr);
+        if(ret<0)
+            qDebug()<<"视频解码失败";
     }
 
     if (audioStreamIndex >= 0) {
@@ -104,8 +125,10 @@ void DecodeThread::initDecode() {
         const AVCodec* audioCodec = avcodec_find_decoder(audioCodecParameters->codec_id);
         audioCodecContext = avcodec_alloc_context3(audioCodec);
         avcodec_parameters_to_context(audioCodecContext, audioCodecParameters);
-        avcodec_open2(audioCodecContext, audioCodec, nullptr);
-
+        int ret = avcodec_open2(audioCodecContext, audioCodec, nullptr);
+        if(ret < 0 ){
+            qDebug()<<"音频解码失败";
+        }
     }
 
 }

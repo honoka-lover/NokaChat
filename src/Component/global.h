@@ -9,7 +9,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class ModelFunction:public QOpenGLExtraFunctions
+struct LightData {
+    glm::vec4 position;
+    glm::vec4 color;
+};
+
+class ModelFunction: protected QOpenGLExtraFunctions
 {
 public:
     static ModelFunction* getInstance();

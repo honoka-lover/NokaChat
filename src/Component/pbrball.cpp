@@ -4,21 +4,6 @@
 #include <QMap>
 #include <QDebug>
 
-// lights
-// ------
-static glm::vec3 lightPositions[] = {
-        glm::vec3(-10.0f,  10.0f, 10.0f),
-        glm::vec3( 10.0f,  10.0f, 10.0f),
-        glm::vec3(-10.0f, -10.0f, 10.0f),
-        glm::vec3( 10.0f, -10.0f, 10.0f),
-};
-static glm::vec3 lightColors[] = {
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f)
-};
-
 glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 glm::mat4 captureViews[] =
         {
@@ -30,30 +15,24 @@ glm::mat4 captureViews[] =
                 glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
         };
 
-PbrBall::PbrBall()
-{
+
+PbrBall::PbrBall() {
     initializeOpenGLFunctions();
 
-    static int run = 0;
-    if(!run){
-        shader = new Shader(":/glsl/pbr.vert",":/glsl/pbr.frag");
-        irradianceShader = new Shader(":/glsl/cubemap.vert", ":/glsl/irradiance_convolution.frag");
-        prefilterShader = new Shader(":/glsl/cubemap.vert", ":/glsl/prefilter.frag");
-        brdfShader = new Shader(":/glsl/brdf.vert", ":/glsl/brdf.frag");
+    shader = new Shader(":/glsl/pbr.vert", ":/glsl/pbr.frag");
+    irradianceShader = new Shader(":/glsl/cubemap.vert", ":/glsl/irradiance_convolution.frag");
+    prefilterShader = new Shader(":/glsl/cubemap.vert", ":/glsl/prefilter.frag");
+    brdfShader = new Shader(":/glsl/brdf.vert", ":/glsl/brdf.frag");
+    shader->use();
+    shader->setUniformValue("irradianceMap", 0);
+    shader->setUniformValue("prefilterMap", 1);
+    shader->setUniformValue("brdfLUT", 2);
+    shader->setUniformValue("albedoMap", 3);
+    shader->setUniformValue("normalMap", 4);
+    shader->setUniformValue("metallicMap", 5);
+    shader->setUniformValue("roughnessMap", 6);
+    shader->setUniformValue("aoMap", 7);
 
-        shader->use();
-        shader->setUniformValue("irradianceMap", 0);
-        shader->setUniformValue("prefilterMap", 1);
-        shader->setUniformValue("brdfLUT", 2);
-        shader->setUniformValue("albedoMap", 3);
-        shader->setUniformValue("normalMap", 4);
-        shader->setUniformValue("metallicMap", 5);
-        shader->setUniformValue("roughnessMap", 6);
-        shader->setUniformValue("aoMap", 7);
-
-        run = 1;
-
-    }
 }
 
 bool PbrBall::setTexturePath(QString path)
@@ -128,21 +107,6 @@ void PbrBall::Draw() {
     glBindTexture(GL_TEXTURE_2D, aoMap);
 
     ModelFunction::getInstance()->renderSphere();
-
-    for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
-    {
-        glm::vec3 newPos = lightPositions[i];
-        shader->setUniformValue("lightPositions[" + std::to_string(i) + "]", newPos);
-        shader->setUniformValue("lightColors[" + std::to_string(i) + "]", lightColors[i]);
-
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, newPos);
-        model = glm::scale(model, glm::vec3(0.5f));
-        shader->setUniformValue("model", model);
-        shader->setUniformValue("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-        ModelFunction::getInstance()->renderSphere();
-    }
-
 }
 
 void PbrBall::setUniformValue(const std::string &name, const glm::mat3 &matrix) {
@@ -267,4 +231,23 @@ void PbrBall::setFrameBuffer(uint captureFBO, uint captureRBO) {
     ModelFunction::getInstance()->renderQuad();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void PbrBall::setLightVec(int lightNums, LightData* data) {
+    shader->use();
+    shader->setUniformValue("lightVecNums", lightNums);
+    glGenBuffers(1, &ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    int bufferSize = 32 * lightNums;
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, data, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo); //与着色器中binding值绑定，这里设置是0
+
+}
+
+void PbrBall::moveToPos(float x, float y, float z) {
+    shader->use();
+    auto pbrModel = glm::mat4(1.0f);
+    pbrModel = glm::translate(pbrModel, glm::vec3(x, y, z));
+    shader->setUniformValue("model", pbrModel);
+    shader->setUniformValue("normalMatrix", glm::transpose(glm::inverse(glm::mat3(pbrModel))));
 }

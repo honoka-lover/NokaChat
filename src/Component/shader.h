@@ -28,7 +28,7 @@ public:
         QFile vShaderFile;
         QFile fShaderFile;
         QFile gShaderFile;
-        try 
+        try
         {
             // open files
             vShaderFile.setFileName(vertexPath);

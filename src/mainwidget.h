@@ -12,6 +12,7 @@
 #include "Component/videowidget.h"
 #include "Component/decodethread.h"
 #include "Component/videolist.h"
+#include "Component/audioplayer.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWidget; }
 QT_END_NAMESPACE
@@ -41,6 +42,8 @@ private:
 	MyMusicPlayer* mymusicplayer;
 
     VideoWidget *videoPlayer;
+
+    AudioPlayer *audioPlayer;
 
     DecodeThread *decode;
 

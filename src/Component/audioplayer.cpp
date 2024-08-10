@@ -4,7 +4,9 @@ AudioPlayer::AudioPlayer(QObject* parent):
     QObject(parent),
     audioSink(nullptr),
     audioIODevice(nullptr)
-{}
+{
+
+}
 
 AudioPlayer::~AudioPlayer()
 {
@@ -14,10 +16,10 @@ AudioPlayer::~AudioPlayer()
     }
 }
 
-void AudioPlayer::setAudioSink(QAudioSink *audioSink, QIODevice *audioIODevice)
+void AudioPlayer::setAudioSink(QAudioSink *audioSink)
 {
     this->audioSink = audioSink;
-    this->audioIODevice = audioIODevice;
+    this->audioIODevice = audioSink->start();
     setVolumn(100);
 }
 
@@ -52,7 +54,7 @@ void AudioPlayer::audioWrite(const char *data, int len)
     if(audioIODevice)
         audioIODevice->write(data,len);
     else
-        qDebug()<<"播放设备为初始化";
+        qDebug()<<"播放设备未初始化";
     m_mutex.unlock();
 }
 

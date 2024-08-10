@@ -20,7 +20,7 @@ class PlayAudioThread : public QThread {
 signals:
     void sigAudioData(const char*,int);
 public:
-    PlayAudioThread(QObject* parent = nullptr);
+    PlayAudioThread(AudioPlayer *audio, QObject* parent = nullptr);
     ~PlayAudioThread();
 
     void setQueues(DataQueue<AVFrame*>* audioQueue);
@@ -59,6 +59,7 @@ private:
     QMutex mutex;
     QWaitCondition condition;
     AudioPlayer *audioPlayer;
+    QAudioSink *audioSink;
 };
 
 // 函数：将音频样本格式转换为 16 位整型

@@ -51,5 +51,6 @@ private:
     TextTexture *m_textTexture;
     SkyBox *m_back;
     PbrBall m_pbrBall;
+    PbrBall light1;
 };
 

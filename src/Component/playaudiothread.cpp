@@ -3,15 +3,14 @@
 #include <QDebug>
 #include <QTimer>
 #include <QMediaDevices>
-PlayAudioThread::PlayAudioThread(QObject* parent):
+PlayAudioThread::PlayAudioThread(AudioPlayer *audio, QObject* parent):
     QThread(parent),
     stopped(false),
     audioCodecContext(nullptr),
     pFormatContext(nullptr),
-    audioStreamIndex(-1)
+    audioStreamIndex(-1),
+    audioPlayer(audio)
 {
-    audioPlayer = new AudioPlayer;
-    connect(this,&PlayAudioThread::sigAudioData,audioPlayer,&AudioPlayer::audioWrite);
     startTime = av_gettime();
     stopTime = av_gettime();
     resumeTime = av_gettime();
@@ -79,11 +78,9 @@ void PlayAudioThread::init()
         // format.setChannelConfig(audioCodecContext->ch_layout.order)
 
         QAudioDevice audioDevice = QMediaDevices::defaultAudioOutput();
-        auto audioSink = new QAudioSink(audioDevice, format);
+        audioSink = new QAudioSink(audioDevice, format);
 
-        auto audioIODevice = audioSink->start();
-
-        audioPlayer->setAudioSink(audioSink,audioIODevice);
+        audioPlayer->setAudioSink(audioSink);
         bindDevice = true;
     }
 }
@@ -145,10 +142,6 @@ void PlayAudioThread::stop() {
     requestInterruption();
     resume();
     audioQueue->stop();
-    if(audioPlayer)
-        audioPlayer->stop();
-    delete audioPlayer;
-    audioPlayer = nullptr;
 }
 
 void PlayAudioThread::updateTimeStamp(int64_t stamp)

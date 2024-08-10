@@ -16,7 +16,11 @@ public:
 
     void setCubeMap(uint textureID);
 
+    void setLightVec(int lightNums, LightData* data);
+
     void setFrameBuffer(uint FBO,uint RBO);
+
+    void moveToPos(float x,float y, float z);
 
     void setUniformValue(const std::string &name, const QMatrix4x4 &matrix);
     void setUniformValue(const std::string &name, const QMatrix3x3 &matrix);
@@ -28,7 +32,7 @@ private:
     Shader *shader,*irradianceShader,*prefilterShader, *brdfShader;
 
     unsigned int albedoMap = -1, normalMap = -1, metallicMap = -1, roughnessMap = -1, aoMap = -1;
-    GLuint irradianceMap = -1, prefilterMap = -1, brdfLUTTexture = -1;
+    GLuint irradianceMap = -1, prefilterMap = -1, brdfLUTTexture = -1, ssbo = -1;
 
     GLuint envCubeMap = -1;
 };

@@ -20,6 +20,7 @@ MainWidget::MainWidget(QWidget *parent)
     , downlaodTool(nullptr)
     , innerWidget(nullptr)
     , videoList(nullptr)
+    , audioPlayer(nullptr)
 {
     ui->setupUi(this);
 
@@ -162,12 +163,13 @@ void MainWidget::playFile(QString file)
     decode->bindVideoWidget(videoPlayer);
     decode->setFileName(file);
 
-    audioThread = new PlayAudioThread(this);
+    audioThread = new PlayAudioThread(audioPlayer,this);
     videoThread = new PlayVideoThread(this);
     decode->bindPlayThread(audioThread,videoThread);
     connect(videoThread,&PlayVideoThread::frameDecoded,videoPlayer,&VideoWidget::setFrame);
     connect(videoPlayer,&VideoWidget::sendVolumn,audioThread,&PlayAudioThread::setVolumn);
     connect(videoPlayer,&VideoWidget::updateTime,decode,&DecodeThread::seek);
+    connect(audioThread,&PlayAudioThread::sigAudioData,audioPlayer,&AudioPlayer::audioWrite);
     decode->start();
     audioThread->start();
     videoThread->start();
@@ -245,6 +247,9 @@ void MainWidget::setTypeList(int style)
             //右边frame窗口
             videoList = new VideoList(this);
             rightLayout->addWidget(videoList);
+        }
+        if(!audioPlayer){
+            audioPlayer = new AudioPlayer;
         }
 
         videoPlayer->show();

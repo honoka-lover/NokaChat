@@ -13,6 +13,25 @@
 #include <QtCore/qbuffer.h>
 #include <iostream>
 
+// lights
+// ------
+static LightData lightData[] = {
+        {
+                glm::vec4(-10.0f, 10.0f, 10.0f ,1.0f),
+                glm::vec4(300.0f, 300.0f, 300.0f ,1.0f)},
+        {
+                glm::vec4(10.0f, 10.0f, 10.0f, 1.0f),
+                glm::vec4(300.0f, 300.0f, 300.0f, 1.0f)},
+        {
+                glm::vec4(-10.0f, -10.0f, 10.0f, 1.0f),
+                glm::vec4(300.0f, 300.0f, 300.0f, 1.0f),
+        },
+        {
+                glm::vec4(10.0f, -10.0f, 10.0f, 1.0f),
+                glm::vec4(300.0f, 300.0f, 300.0f, 1.0f)
+        }
+};
+
 OpenGLWidget::OpenGLWidget(QWidget* parent)
         : QOpenGLWidget(parent),
           m_camera(new Camera(QVector3D(0.0f, 0.0f, 15.0f)))
@@ -99,6 +118,14 @@ void OpenGLWidget::initializeGL()
     m_pbrBall.setTexturePath("../resources/pbr/gold");
     m_pbrBall.setCubeMap(m_back->getCubeMapID());
     m_pbrBall.setFrameBuffer(m_back->getCaptureFBO(),m_back->getCaptureRBO());
+    m_pbrBall.setLightVec(4,lightData);
+    m_pbrBall.moveToPos(1.0f,0.0f,2.0f);
+
+//    light1.setTexturePath("../resources/pbr/gold");
+//    light1.setCubeMap(m_back->getCubeMapID());
+//    light1.setFrameBuffer(m_back->getCaptureFBO(),m_back->getCaptureRBO());
+//    light1.setLightVec(4,lightData);
+//    light1.moveToPos(lightData[0].position.x,lightData[0].position.y,lightData[0].position.z);
 
     this->m_uniformBlockIndexEarth = glGetUniformBlockIndex(this->m_program.programId(), "Matrices");
     glUniformBlockBinding(m_program.programId(), m_uniformBlockIndexEarth, 0);
@@ -155,24 +182,21 @@ void OpenGLWidget::paintGL()
     m_program.setUniformValue("model", model);
 
     m_program.setUniformValue("cameraPos", m_camera->Position);
-    m_model->Draw(&m_program);
+//    m_model->Draw(&m_program);
     m_program.release();
 
     m_back->setViewMatrix(QMatrix4x4(m_camera->GetViewMatrix3x3()),m_uboMatrices);
 
 
-
-    auto pbrModel = glm::mat4(1.0f);
-    pbrModel = glm::translate(pbrModel, glm::vec3(1.0, 0.0, 2.0));
-    m_pbrBall.setUniformValue("model", pbrModel);
-    m_pbrBall.setUniformValue("normalMatrix", glm::transpose(glm::inverse(glm::mat3(pbrModel))));
     m_pbrBall.setUniformValue("camPos", m_camera->Position);
     m_pbrBall.setUniformValue("projection", projection);
     m_pbrBall.setUniformValue("view", view);
     m_pbrBall.Draw();
 
-    m_back->Draw();
 
+    //背景盒
+    m_back->Draw();
+    //文字
     m_textTexture->RenderText(QString("你好").toStdU32String(),0,10,40,QColor("#ff0000"));
 }
 
