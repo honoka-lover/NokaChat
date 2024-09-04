@@ -176,18 +176,24 @@ void VideoWidget::updateTextures() {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width,height,0,GL_RED, GL_UNSIGNED_BYTE,currentFrame->data[0]);
         // textureY->setData(QOpenGLTexture::Red, QOpenGLTexture::UInt8, QSize(width, height), currentFrame->data[0]);
         program->setUniformValue(textureUniformY, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glActiveTexture(GL_TEXTURE1);
         textureU->bind();
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width/2, height/2, 0,GL_RED, GL_UNSIGNED_BYTE,currentFrame->data[1]);
         // textureU->setData(QOpenGLTexture::Red, QOpenGLTexture::UInt8, QSize(width / 2, height / 2), currentFrame->data[1]);
         program->setUniformValue(textureUniformU, 1);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glActiveTexture(GL_TEXTURE2);
         textureV->bind();
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width/2,height/2,0,GL_RED, GL_UNSIGNED_BYTE,currentFrame->data[2]);
         // textureV->setData(QOpenGLTexture::Red, QOpenGLTexture::UInt8, QSize(width / 2, height / 2), currentFrame->data[2]);
         program->setUniformValue(textureUniformV, 2);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 }
 

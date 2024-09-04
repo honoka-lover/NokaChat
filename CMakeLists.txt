@@ -9,7 +9,8 @@ set(CMAKE_AUTOUIC ON)
 
 if(MSVC)
     # Visual Studio specific settings
-    set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
+#    set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
+    set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
 else()
     # MinGW specific settings
     set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/mingw_64/lib/cmake")
@@ -58,7 +59,7 @@ endforeach()
 
 include_directories(src include include/freetype)
 if (MSVC)
-    file(GLOB LibFile "lib/*.lib" "lib/msvc/*.lib" "lib/*.dll.a" "lib/mingw/*.dll.a")
+    file(GLOB LibFile "lib/*.lib" "lib/msvc/*.lib" "lib/*.dll.a" "lib/msvc/*.dll.a")
     file(GLOB DllFile "dll/*.dll" "dll/msvc/*.dll")
 else ()
     file(GLOB LibFile "lib/*.lib" "lib/mingw/*.lib" "lib/*.dll.a" "lib/mingw/*.dll.a")
