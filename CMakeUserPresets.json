@@ -25,7 +25,6 @@
                 "CMAKE_C_COMPILER": "E:/software/msys64/mingw64/bin/gcc.exe",
                 "CMAKE_CXX_COMPILER": "E:/software/msys64/mingw64/bin/g++.exe",
                 "CMAKE_MAKE_PROGRAM": "E:/qt6/Tools/Ninja/ninja.exe",
-                "CMAKE_COMMAND": "E:/software/cmake/bin/cmake.exe",
                 "CMAKE_CXX_FLAGS": "-DQT_QML_DEBUG"
             }
         },
@@ -35,7 +34,7 @@
             "displayName": "",
             "inherits": "Qt6MingwDebug",
             "environment": {
-                "QTDIR": "E:/qt5/5.12.8/mingw73_64/lib/cmake"
+                "QTDIR": "E:/qt5/5.12.8/mingw73_64"
             }
         },
         {
@@ -53,7 +52,7 @@
             "displayName": "",
             "inherits": "Qt6MingwRelease",
             "environment": {
-                "QTDIR": "E:/qt5/5.12.8/mingw73_64/lib/cmake"
+                "QTDIR": "E:/qt5/5.12.8/mingw73_64"
             }
         },
         {
@@ -69,7 +68,6 @@
                 "CMAKE_C_COMPILER": "D:/vs2022/ide/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64/cl.exe",
                 "CMAKE_CXX_COMPILER": "D:/vs2022/ide/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64/cl.exe",
                 "CMAKE_MAKE_PROGRAM": "E:/qt6/Tools/Ninja/ninja.exe",
-                "CMAKE_COMMAND": "D:/vs2022/ide/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
                 "CMAKE_CXX_FLAGS": "-DQT_QML_DEBUG"
             }
         },
@@ -79,7 +77,7 @@
             "displayName": "",
             "inherits": "Qt6MSVCDebug",
             "environment": {
-                "QTDIR": "E:/qt5/5.12.8/msvc2017_64/lib/cmake"
+                "QTDIR": "E:/qt5/5.12.8/msvc2017_64"
             }
         },
         {
@@ -97,7 +95,7 @@
             "displayName": "",
             "inherits": "Qt6MSVCRelease",
             "environment": {
-                "QTDIR": "E:/qt5/5.12.8/msvc2017_64/lib/cmake"
+                "QTDIR": "E:/qt5/5.12.8/msvc2017_64"
             }
         }
     ]

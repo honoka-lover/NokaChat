@@ -7,17 +7,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-if(MSVC)
-    # Visual Studio specific settings
-    #    set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
-    set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
-else()
-    # MinGW specific settings
-    set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/mingw_64/lib/cmake")
-endif()
-
-#message("CMAKE_PREFIX_PATH: "${CMAKE_PREFIX_PATH})
-
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network Core Gui Multimedia OpenGLWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network Core Gui Multimedia OpenGLWidgets)
 
@@ -65,16 +54,6 @@ add_executable(Vanilla
     resources/resource.qrc
     resources/myicon.rc
 )
-target_link_libraries(Vanilla
-        PRIVATE
-        Qt::Core
-        Qt::Gui
-        Qt::Widgets
-        Qt::Network
-        Qt::Multimedia
-        Qt::OpenGLWidgets
-        ${LibFile}
-)
 
 target_link_libraries(Vanilla PRIVATE
         Qt${QT_VERSION_MAJOR}::Widgets
@@ -87,12 +66,7 @@ target_link_libraries(Vanilla PRIVATE
         ${LibFile}
 )
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Vanilla)
-endif()
+
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Vanilla)
