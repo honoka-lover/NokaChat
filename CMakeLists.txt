@@ -9,7 +9,7 @@ set(CMAKE_AUTOUIC ON)
 
 if(MSVC)
     # Visual Studio specific settings
-#    set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
+    #    set(CMAKE_PREFIX_PATH "E:/qt6/6.6.3/msvc2019_64/lib/cmake")
     set(CMAKE_PREFIX_PATH "F:/QT/6.6.1/msvc2019_64/lib/cmake")
 else()
     # MinGW specific settings
@@ -18,14 +18,8 @@ endif()
 
 #message("CMAKE_PREFIX_PATH: "${CMAKE_PREFIX_PATH})
 
-find_package(Qt6 COMPONENTS
-        Core
-        Gui
-        Widgets
-        Network
-        Multimedia
-        OpenGLWidgets
-        REQUIRED)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network Core Gui Multimedia OpenGLWidgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network Core Gui Multimedia OpenGLWidgets)
 
 # 设置源文件目录
 set(SRC_DIR "src")
@@ -67,9 +61,9 @@ else ()
 endif ()
 
 add_executable(Vanilla
-        ${FILTERED_SRC_FILES}
-        resources/resource.qrc
-        resources/myicon.rc
+    ${FILTERED_SRC_FILES}
+    resources/resource.qrc
+    resources/myicon.rc
 )
 target_link_libraries(Vanilla
         PRIVATE
@@ -81,11 +75,34 @@ target_link_libraries(Vanilla
         Qt::OpenGLWidgets
         ${LibFile}
 )
+
+target_link_libraries(Vanilla PRIVATE
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Gui
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Network
+        Qt${QT_VERSION_MAJOR}::Multimedia
+        Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+        ${LibFile}
+)
+
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# If you are developing for iOS or macOS you should consider setting an
+# explicit, fixed bundle identifier manually though.
+if(${QT_VERSION} VERSION_LESS 6.1.0)
+    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Vanilla)
+endif()
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(Vanilla)
+endif()
+
 set(NAME "Vanilla")
 #设置输出目录
 if(WIN32)
-        set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
-        set_target_properties(${NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Debug")
+    set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
+    set_target_properties(${NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Debug")
 endif(WIN32)
 
 #复制dll和配置文件到执行目录
@@ -106,4 +123,3 @@ set(CPACK_PACKAGE_NAME "Vanilla")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_GENERATOR "ZIP")
 include(CPack)
-
