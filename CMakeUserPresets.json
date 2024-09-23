@@ -1,102 +1,104 @@
 {
-    "version": 3,
-    "configurePresets": [
-        {
-            "hidden": true,
-            "name": "Qt-Default",
-            "inherits": "Qt",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "architecture": {
-                "strategy": "external",
-                "value": "x64"
-            }
-        },
-        {
-            "name": "Qt6MingwDebug",
-            "description": "",
-            "displayName": "",
-            "inherits": "Qt-Default",
-            "environment": {
-                "QTDIR": "E:/qt6/6.6.3/mingw_64"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "E:/software/msys64/mingw64/bin/gcc.exe",
-                "CMAKE_CXX_COMPILER": "E:/software/msys64/mingw64/bin/g++.exe",
-                "CMAKE_MAKE_PROGRAM": "E:/qt6/Tools/Ninja/ninja.exe",
-                "CMAKE_CXX_FLAGS": "-DQT_QML_DEBUG"
-            }
-        },
-        {
-            "name": "Qt5MingwDebug",
-            "description": "",
-            "displayName": "",
-            "inherits": "Qt6MingwDebug",
-            "environment": {
-                "QTDIR": "E:/qt5/5.12.8/mingw73_64"
-            }
-        },
-        {
-            "name": "Qt6MingwRelease",
-            "description": "",
-            "displayName": "",
-            "inherits": "Qt6MingwDebug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "Qt5MingwRelease",
-            "description": "",
-            "displayName": "",
-            "inherits": "Qt6MingwRelease",
-            "environment": {
-                "QTDIR": "E:/qt5/5.12.8/mingw73_64"
-            }
-        },
-        {
-            "name": "Qt6MSVCDebug",
-            "description": "",
-            "displayName": "",
-            "inherits": "Qt-Default",
-            "environment": {
-                "QTDIR": "E:/qt6/6.6.3/msvc2019_64"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "D:/vs2022/ide/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64/cl.exe",
-                "CMAKE_CXX_COMPILER": "D:/vs2022/ide/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64/cl.exe",
-                "CMAKE_MAKE_PROGRAM": "E:/qt6/Tools/Ninja/ninja.exe",
-                "CMAKE_CXX_FLAGS": "-DQT_QML_DEBUG"
-            }
-        },
-        {
-            "name": "Qt5MSVCDebug",
-            "description": "",
-            "displayName": "",
-            "inherits": "Qt6MSVCDebug",
-            "environment": {
-                "QTDIR": "E:/qt5/5.12.8/msvc2017_64"
-            }
-        },
-        {
-            "name": "Qt6MSVCRelease",
-            "description": "",
-            "displayName": "",
-            "inherits": "Qt6MSVCDebug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "Qt5MSVCRelease",
-            "description": "",
-            "displayName": "",
-            "inherits": "Qt6MSVCRelease",
-            "environment": {
-                "QTDIR": "E:/qt5/5.12.8/msvc2017_64"
-            }
-        }
-    ]
+  "version": 3,
+  "configurePresets": [
+    {
+      "hidden": true,
+      "name": "Qt-Default",
+      "inherits": "Qt",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "architecture": {
+        "strategy": "external",
+        "value": "x64"
+      }
+    },
+    {
+      "name": "Qt6MingwDebug",
+      "description": "",
+      "displayName": "",
+      "inherits": "Qt-Default",
+      "environment": {
+        "QTDIR": "E:/qt6/6.6.3/mingw_64"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "E:/software/msys64/mingw64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "E:/software/msys64/mingw64/bin/g++.exe",
+        "CMAKE_MAKE_PROGRAM": "E:/qt6/Tools/Ninja/ninja.exe",
+        "CMAKE_COMMAND": "E:/software/cmake/bin/cmake.exe",
+        "CMAKE_CXX_FLAGS": "-DQT_QML_DEBUG"
+      }
+    },
+    {
+      "name": "Qt5MingwDebug",
+      "description": "",
+      "displayName": "",
+      "inherits": "Qt6MingwDebug",
+      "environment": {
+        "QTDIR": "E:/qt5/5.12.8/mingw73_64/lib/cmake"
+      }
+    },
+    {
+      "name": "Qt6MingwRelease",
+      "description": "",
+      "displayName": "",
+      "inherits": "Qt6MingwDebug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "Qt5MingwRelease",
+      "description": "",
+      "displayName": "",
+      "inherits": "Qt6MingwRelease",
+      "environment": {
+        "QTDIR": "E:/qt5/5.12.8/mingw73_64/lib/cmake"
+      }
+    },
+    {
+      "name": "Qt6MSVCDebug",
+      "description": "",
+      "displayName": "",
+      "inherits": "Qt-Default",
+      "environment": {
+        "QTDIR": "E:/qt6/6.6.3/msvc2019_64"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "D:/vs2022/ide/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64/cl.exe",
+        "CMAKE_CXX_COMPILER": "D:/vs2022/ide/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64/cl.exe",
+        "CMAKE_MAKE_PROGRAM": "E:/qt6/Tools/Ninja/ninja.exe",
+        "CMAKE_COMMAND": "D:/vs2022/ide/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+        "CMAKE_CXX_FLAGS": "-DQT_QML_DEBUG"
+      }
+    },
+    {
+      "name": "Qt5MSVCDebug",
+      "description": "",
+      "displayName": "",
+      "inherits": "Qt6MSVCDebug",
+      "environment": {
+        "QTDIR": "E:/qt5/5.12.8/msvc2017_64/lib/cmake"
+      }
+    },
+    {
+      "name": "Qt6MSVCRelease",
+      "description": "",
+      "displayName": "",
+      "inherits": "Qt6MSVCDebug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "Qt5MSVCRelease",
+      "description": "",
+      "displayName": "",
+      "inherits": "Qt6MSVCRelease",
+      "environment": {
+        "QTDIR": "E:/qt5/5.12.8/msvc2017_64/lib/cmake"
+      }
+    }
+  ]
 }
